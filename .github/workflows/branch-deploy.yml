@@ -93,10 +93,14 @@ jobs:
           })
 
   branch-deploy:
+    environment: production
     name: ".deploy"
     if: startsWith(github.event.comment.body, '.deploy')
     needs: [prechecks]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
 
     steps:
       - name: Validating command and associated PS env
@@ -121,15 +125,18 @@ jobs:
               throw new Error(message)
             }
             
-            core.info("DB branch name: " + BRANCH_NAME)
+            core.info("branch name: " + BRANCH_NAME)
             core.setOutput('BRANCH_NAME',  BRANCH_NAME)
             
             const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
             
             const commentBody = `\
-            🚀 __${context.actor}__, Triggering a branch deployment __${BRANCH_NAME}__ for Git branch __${REF}__ now ...
+            🚀 __${context.actor}__, starting a branch deployment 
             
-            You can watch the progress [here](${log_url}).
+            - Branch: \`__${BRANCH_NAME}__\`
+            - REF: \`__${REF}__\`
+            
+            You can watch the progress [here](${log_url})
             `;
             
             await github.issues.createComment({
