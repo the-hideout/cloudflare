@@ -1,3 +1,21 @@
+resource "cloudflare_record" "root" {
+  name    = "tarkov.dev"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "tarkov-dev.pages.dev"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "www" {
+  name    = "www"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "tarkov-dev.pages.dev"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
 resource "cloudflare_record" "api" {
   name    = "api"
   proxied = true
