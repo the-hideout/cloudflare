@@ -29,8 +29,8 @@ resource "cloudflare_zone_settings_override" "tarkov_dev" {
     zero_rtt                 = "on"
 
     # String Values
-    security_level = "medium"
-    cache_level    = "aggressive"
+    security_level  = "medium"
+    cache_level     = "aggressive"
     min_tls_version = "1.0"
     ssl             = "flexible" # needed for S3 backend assets
 
