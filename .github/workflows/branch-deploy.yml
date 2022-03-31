@@ -161,7 +161,7 @@ jobs:
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         id: apply
-        run: terraform apply -auto-approve
+        run: terraform apply -no-color -auto-approve
         continue-on-error: true
 
       # Post comment on PR with development plan info
@@ -188,4 +188,3 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-
