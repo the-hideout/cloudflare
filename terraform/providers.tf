@@ -1,5 +1,5 @@
 terraform {
-    backend "remote" {
+  backend "remote" {
     organization = "the-hideout"
 
     workspaces {
@@ -9,7 +9,7 @@ terraform {
 
   required_providers {
     cloudflare = {
-      source = "cloudflare/cloudflare"
+      source  = "cloudflare/cloudflare"
       version = "3.11.0"
     }
   }
