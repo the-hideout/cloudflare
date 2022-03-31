@@ -45,7 +45,7 @@ resource "cloudflare_record" "manager" {
 
 resource "cloudflare_record" "status" {
   name    = "status"
-  proxied = true
+  proxied = false
   ttl     = 1
   type    = "A"
   value   = "20.228.137.173"
@@ -58,5 +58,14 @@ resource "cloudflare_record" "socket" {
   ttl     = 60
   type    = "A"
   value   = "20.115.107.210"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "market" {
+  name    = "market"
+  proxied = false
+  ttl     = 60
+  type    = "A"
+  value   = "209.151.146.50"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
