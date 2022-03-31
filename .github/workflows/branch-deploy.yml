@@ -7,9 +7,10 @@ on:
 env:
   WORKING_DIR: "terraform/"
 
+
 jobs:
   prechecks:
-    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '.deploy')
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '.deploy'))
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
