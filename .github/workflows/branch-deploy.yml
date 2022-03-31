@@ -1,0 +1,156 @@
+name: branch-deploy
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  WORKING_DIR: "terraform/"
+
+jobs:
+  prechecks:
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '.deploy')
+    outputs:
+      ref: ${{steps.prechecks.outputs.ref}}
+      eyes: ${{steps.prechecks.outputs.eyes}}
+      sha: ${{steps.prechecks.outputs.sha}}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check permissions and PR ref
+      id: prechecks
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const reactionRes = await github.reactions.createForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            content: 'eyes'
+          })
+          core.setOutput('eyes', reactionRes.data.id)
+          const permissionRes = await github.repos.getCollaboratorPermissionLevel(
+            {
+              ...context.repo,
+              username: context.actor
+            }
+          )
+          if (permissionRes.status !== 200) {
+            message = 'Permission check returns non-200 status: ${permissionRes.status}'
+            core.setOutput('error', message)
+            throw new Error(message)
+          }
+          const actorPermission = permissionRes.data.permission
+          if (!['admin', 'write'].includes(actorPermission)) {
+              message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to /ps-merge this DR, permissions: ${actorPermission}'
+              core.setOutput('error', message)
+              throw new Error(message)
+          }
+          pr = await github.pulls.get(
+            {
+              ...context.repo,
+              pull_number: context.issue.number
+            }
+          )
+          if (pr.status !== 200) {
+            message = 'Could not retrieve PR info: ${permissionRes.status}'
+            core.setOutput('error', message)
+            throw new Error(message)
+          }
+          core.setOutput('ref', pr.data.head.ref)
+          core.setOutput('sha', pr.data.head.sha)
+
+    - name: Pre-Check-Failed
+      id: precheck-failed
+      if: failure()
+      uses: actions/github-script@v3
+      env:
+        message: ${{steps.prechecks.outputs.error}}
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+          const { message } = process.env;
+          // check if message is null or empty
+          if (!message || message.length === 0) {
+            message = 'Unknown error, [check logs](' + log_url + ') for more details.'
+          }
+          github.issues.createComment({
+            ...context.repo,
+            issue_number: context.issue.number,
+            body: message
+          })
+          await github.reactions.createForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            content: '-1'
+          })
+          await github.reactions.deleteForIssueComment({
+            ...context.repo,
+            comment_id: ${{github.event.comment.id}},
+            reaction_id: ${{steps.prechecks.outputs.eyes}}
+          })
+
+  branch-deploy:
+    name: ".deploy"
+    if: startsWith(github.event.comment.body, '.deploy')
+    needs: [prechecks]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validating command and associated PS env
+        id: validate_params
+        env:
+          REF: ${{ needs.prechecks.outputs.ref }}
+          comment: ${{ github.event.comment.body }}
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { REF, comment } = process.env;
+            // check if comment starts with '.deploy' and is only followed by whitespaces
+            const regexCommandWithoutParameters = /^\.deploy\s*$/
+            
+            BRANCH_NAME = REF
+            if (regexCommandWithoutParameters.test(comment)) {
+              console.log(".deploy command used - OK")
+            } else {
+              message = 'Invalid command, please use \`.deploy\`.'
+              core.setOutput('error', message)
+              throw new Error(message)
+            }
+            
+            core.info("DB branch name: " + BRANCH_NAME)
+            core.setOutput('BRANCH_NAME',  BRANCH_NAME)
+            
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            
+            const commentBody = `\
+            🚀 __${context.actor}__, Triggering a branch deployment __${BRANCH_NAME}__ for Git branch __${REF}__ now ...
+            
+            You can watch the progress [here](${log_url}).
+            `;
+            
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: commentBody
+            })
+
+      - name: Checkout
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # pin@v2
+        with:
+          ref: ${{ needs.prechecks.outputs.ref }}
+
+      - uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # pin@v1
+        with:
+          terraform_version: 1.1.7
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform apply
+        env:
+          TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+        run: terraform apply -auto-approve
