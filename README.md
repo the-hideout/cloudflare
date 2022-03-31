@@ -8,7 +8,7 @@ This repository uses Terraform to manage the configration and state for all supp
 
 - [`Zones`](terraform/zones.tf)
 - [`DNS`](terraform/dns.tf)
-- Members
+- [`Zone Settings`](terraform/zone_settings.tf)
 - More to come!
 
 ## Usage 🔨
