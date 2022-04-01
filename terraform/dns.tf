@@ -21,8 +21,17 @@ resource "cloudflare_record" "api" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "api.hideout-api.workers.dev"
+  value   = "tarkov-dev-prod.graphcdn.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "dev_api" {
+    name        = "dev-api"
+    proxied     = true
+    ttl         = 1
+    type        = "CNAME"
+    value       = "tarkov-api-dev.graphcdn.app"
+    zone_id     = var.CLOUDFLARE_ZONE_ID
 }
 
 resource "cloudflare_record" "assets" {
