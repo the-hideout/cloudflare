@@ -53,11 +53,11 @@ resource "cloudflare_record" "status" {
 }
 
 resource "cloudflare_record" "socket" {
-  name    = "manager"
-  proxied = false
-  ttl     = 60
-  type    = "A"
-  value   = "20.115.107.210"
+  name    = "socket"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "hideout-socket-server.herokuapp.com"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
