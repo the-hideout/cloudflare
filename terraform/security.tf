@@ -19,7 +19,7 @@ resource "cloudflare_rate_limit" "tarkov_dev" {
       schemes = [
         "_ALL_",
       ]
-      url_pattern = "api.tarkov.dev/*"
+      url_pattern = "*api.tarkov.dev/*"
     }
 
     response {
