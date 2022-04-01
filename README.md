@@ -11,6 +11,7 @@ This repository uses Terraform to manage the configration and state for all supp
 - [`Zones`](terraform/zones.tf)
 - [`DNS`](terraform/dns.tf)
 - [`Zone Settings`](terraform/zone_settings.tf)
+- [`Rate Limits + Some Security Settings`](terraform/security.tf)
 - More to come!
 
 ## Usage 🔨
@@ -25,7 +26,9 @@ To deploy a change to our CF infrastructure, simply do the following:
 1. Open a pull request with your changes
 1. Ensure CI is passing and review the Terraform Plan comment on your pull request
 1. Obtain a review confirming your changes
-1. Merge! Upon merging, your changes will be automatically deployed to production ✨
+1. Branch deploy your change to production via a comment on your pull request - [branch deploy example](https://github.com/the-hideout/cloudflare/pull/11)
+1. Wait at least 5 minutes to ensure your changes are working as expected
+1. Merge! Upon merging, your changes will be automatically deployed to production (again) ✨
 
 ### Local Development 🧱
 
