@@ -180,6 +180,8 @@ jobs:
 
             </details>
 
+            Please wait at least 5 minutes after a deployment to validate your changes before merging
+
             > Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`terraform/\`, Workflow: \`${{ github.workflow }}\``;
 
             github.issues.createComment({
