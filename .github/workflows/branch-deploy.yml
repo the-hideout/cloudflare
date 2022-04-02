@@ -3,8 +3,6 @@ name: branch-deploy
 on:
   issue_comment:
     types: [ created ]
-    paths:
-      - 'terraform/**'
 
 env:
   WORKING_DIR: "terraform/"
