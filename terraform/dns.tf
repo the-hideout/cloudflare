@@ -18,10 +18,10 @@ resource "cloudflare_record" "www" {
 
 resource "cloudflare_record" "api" {
   name    = "api"
-  proxied = false
+  proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "ecp.map.fastly.net"
+  value   = "tarkov-dev-prod.graphcdn.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
