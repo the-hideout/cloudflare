@@ -15,7 +15,7 @@ jobs:
   # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
   # https://github.com/actions/runner/issues/480#issuecomment-1055373623
   params:
-    name: Setup ENV VARs
+    name: Setup env
     runs-on: ubuntu-latest
     outputs:
         params: ${{ steps.env-vars.outputs.params }}
