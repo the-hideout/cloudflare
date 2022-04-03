@@ -222,7 +222,7 @@ jobs:
           script: |
             const output = `### Deployment Results - Production 🪐
             - Deployment 🚀: \`${{ steps.apply.outcome }}\`
-            - Branch: \`${{ process.env.REF }}\`
+            - Branch: \`${process.env.REF}\`
 
             <details><summary>Show Apply</summary>
 
