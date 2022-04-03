@@ -4,14 +4,31 @@ on:
   issue_comment:
     types: [ created ]
 
+# Custom configration to define branch-deploy commands
 env:
   WORKING_DIR: "terraform/"
   DEPLOY_COMMAND: ".deploy"
   MAIN_BRANCH: "main"
 
 jobs:
+
+  # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
+  # https://github.com/actions/runner/issues/480#issuecomment-1055373623
+  params:
+    name: Setup ENV VARs
+    runs-on: ubuntu-latest
+    outputs:
+        params: ${{ steps.env-vars.outputs.params }}
+    steps:
+      - name: install jq
+        run: pip install jq
+      - id: env-vars
+        name: Output environment variables
+        run: echo "::set-output name=params::$(echo $(jq -n 'env'))"
+
   prechecks:
-    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, env.DEPLOY_COMMAND))
+    needs: [ params ]
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, ${{ fromJson(needs.params.outputs.params).DEPLOY_COMMAND }}))
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
@@ -96,15 +113,15 @@ jobs:
   branch-deploy:
     environment: production
     name: "branch deploy"
-    if: startsWith(github.event.comment.body, env.DEPLOY_COMMAND)
-    needs: [ prechecks ]
+    if: startsWith(github.event.comment.body, ${{ fromJson(needs.params.outputs.params).DEPLOY_COMMAND }})
+    needs: [ prechecks, params ]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
 
     steps:
-      - name: Validating command and associated PS env
+      - name: Validating command
         id: validate_params
         env:
           REF: ${{ needs.prechecks.outputs.ref }}
