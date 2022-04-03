@@ -11,7 +11,6 @@ env:
   MAIN_BRANCH: "main"
 
 jobs:
-
   # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
   # https://github.com/actions/runner/issues/480#issuecomment-1055373623
   params:
@@ -64,7 +63,7 @@ jobs:
             }
             const actorPermission = permissionRes.data.permission
             if (!['admin', 'write'].includes(actorPermission)) {
-                message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to /ps-merge this DR, permissions: ${actorPermission}'
+                message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to branch-deploy this PR, permissions: ${actorPermission}'
                 core.setOutput('error', message)
                 throw new Error(message)
             }
