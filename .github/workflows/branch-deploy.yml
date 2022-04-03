@@ -15,7 +15,7 @@ jobs:
   # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
   # https://github.com/actions/runner/issues/480#issuecomment-1055373623
   params:
-    name: Setup ENV VARs
+    name: Setup env
     runs-on: ubuntu-latest
     outputs:
         params: ${{ steps.env-vars.outputs.params }}
@@ -145,7 +145,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { REF, comment } = process.env;
+            const comment = process.env.comment;
+            var ref = process.env.REF;
             // check if comment starts with the env.DEPLOY_COMMAND variable and is only followed by whitespaces
             const regexCommandWithoutParameters = /^\.deploy\s*$/
 
@@ -155,11 +156,11 @@ jobs:
 
             if (regexCommandWithoutParameters.test(comment)) {
               console.log(`${process.env.DEPLOY_COMMAND} command used on current branch - OK`)
-              BRANCH_NAME = REF
+              BRANCH_NAME = ref
             } else if (regexCommandWithMain.test(comment)) {
               console.log(`${process.env.DEPLOY_COMMAND} command used with 'main' branch - OK`)
               BRANCH_NAME = process.env.MAIN_BRANCH
-              REF = BRANCH_NAME
+              ref = BRANCH_NAME
             }
             else {
               message = `Invalid command, please use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\`.`
@@ -176,7 +177,7 @@ jobs:
             🚀 __${context.actor}__, starting a branch deployment 
 
             - Branch: __${BRANCH_NAME}__
-            - REF: __${REF}__
+            - REF: __${ref}__
 
             You can watch the progress [here](${log_url})
             `;
