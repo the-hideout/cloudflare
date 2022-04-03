@@ -4,6 +4,7 @@ on:
   issue_comment:
     types: [ created ]
 
+# Custom configration to define branch-deploy commands
 env:
   WORKING_DIR: "terraform/"
   DEPLOY_COMMAND: ".deploy"
