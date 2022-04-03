@@ -6,10 +6,12 @@ on:
 
 env:
   WORKING_DIR: "terraform/"
+  DEPLOY_COMMAND: ".deploy"
+  MAIN_BRANCH: "main"
 
 jobs:
   prechecks:
-    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, '.deploy'))
+    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, env.DEPLOY_COMMAND))
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
@@ -93,8 +95,8 @@ jobs:
 
   branch-deploy:
     environment: production
-    name: ".deploy"
-    if: startsWith(github.event.comment.body, '.deploy')
+    name: "branch deploy"
+    if: startsWith(github.event.comment.body, env.DEPLOY_COMMAND)
     needs: [ prechecks ]
     runs-on: ubuntu-latest
     defaults:
@@ -112,14 +114,22 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { REF, comment } = process.env;
-            // check if comment starts with '.deploy' and is only followed by whitespaces
+            // check if comment starts with the env.DEPLOY_COMMAND variable and is only followed by whitespaces
             const regexCommandWithoutParameters = /^\.deploy\s*$/
 
-            BRANCH_NAME = REF
+            // check if comment starts with the env.DEPLOY_COMMAND variable and is followed by the 'main' branch
+            // This is used to roll back a deployment to the 'main' branch
+            const regexCommandWithMain = /^\.deploy\s*(main)$/
+
             if (regexCommandWithoutParameters.test(comment)) {
-              console.log(".deploy command used - OK")
-            } else {
-              message = 'Invalid command, please use \`.deploy\`.'
+              console.log(`${process.env.DEPLOY_COMMAND} command used on current branch - OK`)
+              BRANCH_NAME = REF
+            } else if (regexCommandWithMain.test(comment)) {
+              console.log(`${process.env.DEPLOY_COMMAND} command used with 'main' branch - OK`)
+              BRANCH_NAME = env.MAIN_BRANCH
+            }
+            else {
+              message = `Invalid command, please use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\`.`
               core.setOutput('error', message)
               throw new Error(message)
             }
