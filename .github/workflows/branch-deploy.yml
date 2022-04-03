@@ -44,6 +44,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const comment = process.env.comment;
             const reactionRes = await github.reactions.createForIssueComment({
               ...context.repo,
               comment_id: ${{github.event.comment.id}},
