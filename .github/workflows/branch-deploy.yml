@@ -11,7 +11,6 @@ env:
   MAIN_BRANCH: "main"
 
 jobs:
-
   # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
   # https://github.com/actions/runner/issues/480#issuecomment-1055373623
   params:
@@ -64,7 +63,7 @@ jobs:
             }
             const actorPermission = permissionRes.data.permission
             if (!['admin', 'write'].includes(actorPermission)) {
-                message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to /ps-merge this DR, permissions: ${actorPermission}'
+                message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to branch-deploy this PR, permissions: ${actorPermission}'
                 core.setOutput('error', message)
                 throw new Error(message)
             }
@@ -165,6 +164,11 @@ jobs:
             else {
               message = `Invalid command, please use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\`.`
               core.setOutput('error', message)
+              await github.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: message
+              })
               throw new Error(message)
             }
 
@@ -212,11 +216,13 @@ jobs:
       - uses: actions/github-script@5d03ada4b0a753e9460b312e61cc4f8fdeacf163 # pin@0.9.0
         env:
           APPLY: "terraform ${{ steps.apply.outputs.stdout }}"
+          REF: ${{ needs.prechecks.outputs.ref }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `### Deployment Results - Production 🪐
             - Deployment 🚀: \`${{ steps.apply.outcome }}\`
+            - Branch: \`${{ process.env.REF }}\`
 
             <details><summary>Show Apply</summary>
 
