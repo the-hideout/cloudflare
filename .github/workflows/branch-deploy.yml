@@ -165,6 +165,11 @@ jobs:
             else {
               message = `Invalid command, please use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\`.`
               core.setOutput('error', message)
+              await github.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body: message
+              })
               throw new Error(message)
             }
 
