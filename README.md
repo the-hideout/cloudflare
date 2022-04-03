@@ -55,3 +55,4 @@ To develop with this repository locally, you will need to do the following:
 ### Reaching Out 💬
 
 Should you need assistance or have any questions using this repository, you can always join our [Discord](https://discord.gg/XPAsKGHSzH) for assistance.
+
