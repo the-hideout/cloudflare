@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Check permissions and PR ref
         id: prechecks
+        env:
+          comment: ${{ github.event.comment.body }}
         uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -76,7 +78,19 @@ jobs:
               core.setOutput('error', message)
               throw new Error(message)
             }
-            core.setOutput('ref', pr.data.head.ref)
+
+            // check if comment starts with the env.DEPLOY_COMMAND variable and is followed by the 'main' branch
+            // This is used to roll back a deployment to the 'main' branch
+            var ref
+            const regexCommandWithMain = /^\.deploy\s*(main)$/
+            if (regexCommandWithMain.test(comment)) {
+              console.log(`${process.env.DEPLOY_COMMAND} command used with 'main' branch - setting REF to ${process.env.DEPLOY_COMMAND}`)
+              ref = process.env.MAIN_BRANCH
+            } else {
+              ref = pr.data.head.ref
+            }
+
+            core.setOutput('ref', ref)
             core.setOutput('sha', pr.data.head.sha)
 
       - name: Pre-Check-Failed
@@ -144,6 +158,7 @@ jobs:
             } else if (regexCommandWithMain.test(comment)) {
               console.log(`${process.env.DEPLOY_COMMAND} command used with 'main' branch - OK`)
               BRANCH_NAME = process.env.MAIN_BRANCH
+              REF = BRANCH_NAME
             }
             else {
               message = `Invalid command, please use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\`.`
