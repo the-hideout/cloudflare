@@ -62,6 +62,9 @@ jobs:
                 owner: context.repo.owner,
                 name: context.repo.repo,
                 number: process.env.PR_NUMBER
+                headers: {
+                  Accept: application/vnd.github.merge-info-preview+json,
+                },
               }
               const result = await github.graphql(query, variables)
 
@@ -87,7 +90,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            const { message } = process.env.message;
+            const message = process.env.message;
             // check if message is null or empty
             if (!message || message.length === 0) {
               message = 'Unknown error, [check logs](' + log_url + ') for more details.'
