@@ -38,6 +38,8 @@ jobs:
       - name: Check PR approval status
         uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
         id : check-approval
+        env:
+          PR_NUMBER: ${{ github.event.issue.number}}
         with:
             script: |
               const query = `query($owner:String!, $name:String!, $number:Int!) {
@@ -59,7 +61,7 @@ jobs:
               const variables = {
                 owner: context.repo.owner,
                 name: context.repo.repo,
-                number: context.payload.pull_request.number
+                number: process.env.PR_NUMBER
               }
               const result = await github.graphql(query, variables)
 
