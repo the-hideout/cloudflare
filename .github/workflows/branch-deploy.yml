@@ -24,6 +24,15 @@ jobs:
       - id: env-vars
         name: Output environment variables
         run: echo "::set-output name=params::$(echo $(jq -n 'env'))"
+      - uses: khan/pull-request-comment-trigger@v1.1.0
+        id: check
+        with:
+          trigger: ${{ fromJson(steps.params.outputs.params).DEPLOY_COMMAND }}
+          reaction: eyes
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - run: 'echo Found it!'
+        if: steps.check.outputs.triggered == 'true'
 
   prechecks:
     needs: [ params ]
