@@ -206,6 +206,7 @@ jobs:
           INPUT_REF: ${{ needs.prechecks.outputs.ref }}
           INPUT_AUTO_MERGE: false
           INPUT_ENVIRONMENT: production
+          INPUT_REQUIRED_CONTEXTS: "[]"
 
       - name: set deployment status to in progress
         id: start_deployment
