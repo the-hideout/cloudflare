@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         params: ${{ steps.env-vars.outputs.params }}
+        triggered: ${{ steps.comment-trigger.outputs.triggered }}
     steps:
       - name: install jq
         run: pip install jq
@@ -31,12 +32,14 @@ jobs:
           reaction: eyes
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - run: 'echo Found it!'
+      - run: 'echo "::set-output name=triggered::true"'
         if: steps.check.outputs.triggered == 'true'
+      - run: 'echo "::set-output name=triggered::false"'
+        if: steps.check.outputs.triggered != 'true'
 
   prechecks:
     needs: [ params ]
-    if: github.event.issue.pull_request != null && (startsWith(github.event.comment.body, ${{ fromJson(needs.params.outputs.params).DEPLOY_COMMAND }}))
+    if: github.event.issue.pull_request != null && needs.params.outputs.triggered == 'true'
     outputs:
       ref: ${{steps.prechecks.outputs.ref}}
       eyes: ${{steps.prechecks.outputs.eyes}}
@@ -181,7 +184,7 @@ jobs:
 
   branch-deploy:
     name: "branch deploy"
-    if: startsWith(github.event.comment.body, ${{ fromJson(needs.params.outputs.params).DEPLOY_COMMAND }})
+    if: needs.params.outputs.triggered == 'true'
     needs: [ prechecks, params ]
     runs-on: ubuntu-latest
     defaults:
