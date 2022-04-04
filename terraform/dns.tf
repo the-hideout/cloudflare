@@ -21,7 +21,7 @@ resource "cloudflare_record" "api" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "tarkov-dev-prod.graphcdn.app"
+  value   = "prod-api-tarkov-dev.graphcdn.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -30,7 +30,7 @@ resource "cloudflare_record" "dev_api" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "tarkov-api-dev.graphcdn.app"
+  value   = "dev-api-tarkov-dev.graphcdn.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
