@@ -100,12 +100,7 @@ jobs:
               message = 'Unknown error, [check logs](' + log_url + ') for more details.'
             }
 
-            const comment = `⚠️ Cannot proceed with branch deployment
-            
-            Message: ${message}
-
-            > This is likely due to missing PR approvals or CI checks not passing
-            `
+            const comment = `⚠️ Cannot proceed with branch deployment\n\nMessage: ${message}\n\n> This is likely due to missing PR approvals or CI checks not passing`
 
             github.issues.createComment({
               ...context.repo,
