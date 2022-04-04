@@ -34,6 +34,15 @@ resource "cloudflare_record" "dev_api" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
+resource "cloudflare_record" "development_api" {
+  name    = "development-api"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "ecp.map.fastly.net"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
 resource "cloudflare_record" "assets" {
   name    = "assets"
   proxied = true
