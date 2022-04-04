@@ -25,6 +25,8 @@ jobs:
       - id: env-vars
         name: Output environment variables
         run: echo "::set-output name=params::$(echo $(jq -n 'env'))"
+      
+      # Validate the deploy trigger comment
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: check
         with:
@@ -32,11 +34,6 @@ jobs:
           reaction: eyes
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Branch Deploy Comment Detected
-        if: steps.check.outputs.triggered == 'true'
-        env:
-          TRIGGERED: ${{ steps.check.outputs.triggered }}
-        run: 'echo "Triggered: $TRIGGERED"'
 
   prechecks:
     needs: [ params ]
@@ -128,8 +125,7 @@ jobs:
               const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
 
               // If everything is OK, print a nice message
-              //reviewDecision === "APPROVED" &&  disabled for now
-              if (commitStatus === "SUCCESS") {
+              if (reviewDecision === "APPROVED" && commitStatus === "SUCCESS") {
                   const message = "✔️ Merge is clean and all checks passed - OK";
                   console.log(message);
               // If there are any issues blocking deployment, throw an error and save the error message as an output
@@ -153,6 +149,7 @@ jobs:
             core.setOutput('ref', ref)
             core.setOutput('sha', pr.data.head.sha)
 
+      # If the pre-check fails, create a comment with details to post on the PR
       - name: Pre-Check-Failed
         id: precheck-failed
         if: failure()
@@ -194,7 +191,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
 
     steps:
-
+      # Create a deployment to attach to the pull request where it was triggered
       - name: create deployment
         id: create_deployment
         uses: octokit/request-action@v2.x
@@ -328,6 +325,7 @@ jobs:
               body: output
             })
 
+      # Raise a failure after posting a comment if anything went wrong in the Terraform Apply
       - name: Check Terraform output
         if: steps.apply.outcome == 'failure'
         run: exit 1
