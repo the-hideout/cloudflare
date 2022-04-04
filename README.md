@@ -1,5 +1,6 @@
 # cloudflare ☁️
 
+
 [![ci](https://github.com/the-hideout/cloudflare/actions/workflows/ci.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/ci.yml)
 
 Public Infrastructure as Code (IaC) for The-Hideout's Cloudflare (CF) configuration - managed by Terraform!
