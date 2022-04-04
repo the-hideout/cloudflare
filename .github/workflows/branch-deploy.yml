@@ -128,7 +128,8 @@ jobs:
               const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
 
               // If everything is OK, print a nice message
-              if (reviewDecision === "APPROVED" && commitStatus === "SUCCESS") {
+              //reviewDecision === "APPROVED" &&  disabled for now
+              if (commitStatus === "SUCCESS") {
                   const message = "✔️ Merge is clean and all checks passed - OK";
                   console.log(message);
               // If there are any issues blocking deployment, throw an error and save the error message as an output
