@@ -61,7 +61,7 @@ jobs:
               const variables = {
                 owner: context.repo.owner,
                 name: context.repo.repo,
-                number: process.env.PR_NUMBER
+                number: process.env.PR_NUMBER,
                 headers: {
                   Accept: "application/vnd.github.merge-info-preview+json"
                 },
