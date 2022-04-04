@@ -213,14 +213,14 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: production
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          state: in_progress
           mediaType: '{"previews": ["flash", "ant-man"]}'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}
+          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          INPUT_ENVIRONMENT: production
+          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          INPUT_STATE: in_progress
 
       - name: Validating command
         id: validate_params
@@ -328,23 +328,24 @@ jobs:
               body: output
             })
 
+      - name: Check Terraform output
+        if: steps.apply.outcome == 'failure'
+        run: exit 1
+
       - name: set deployment status to success
+        if: success()
         id: successful_deployment
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: production
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           mediaType: '{"previews": ["ant-man"]}'
-          state: success
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: Check Terraform output
-        if: steps.apply.outcome == 'failure'
-        run: exit 1
+          INPUT_REPOSITORY: ${{ github.repository }}
+          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          INPUT_ENVIRONMENT: production
+          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          INPUT_STATE: success
 
       - name: set deployment status to failure
         id: failed_deployment
@@ -352,11 +353,11 @@ jobs:
         if: failure()
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
-          repository: ${{ github.repository }}
-          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: production
-          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           mediaType: '{"previews": ["ant-man"]}'
-          state: failure
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          INPUT_REPOSITORY: ${{ github.repository }}
+          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          INPUT_ENVIRONMENT: production
+          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          INPUT_STATE: failure
