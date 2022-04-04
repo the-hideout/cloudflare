@@ -17,8 +17,8 @@ jobs:
     name: Setup env
     runs-on: ubuntu-latest
     outputs:
-        params: ${{ steps.env-vars.outputs.params }}
-        triggered: ${{ steps.comment-trigger.outputs.triggered }}
+      params: ${{ steps.env-vars.outputs.params }}
+      triggered: ${{ steps.check.outputs.triggered }}
     steps:
       - name: install jq
         run: pip install jq
@@ -32,10 +32,11 @@ jobs:
           reaction: eyes
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - run: 'echo "::set-output name=triggered::true"'
+      - name: Branch Deploy Comment Detected
         if: steps.check.outputs.triggered == 'true'
-      - run: 'echo "::set-output name=triggered::false"'
-        if: steps.check.outputs.triggered != 'true'
+        env:
+          TRIGGERED: ${{ steps.check.outputs.triggered }}
+        run: 'echo "Triggered: $TRIGGERED"'
 
   prechecks:
     needs: [ params ]
