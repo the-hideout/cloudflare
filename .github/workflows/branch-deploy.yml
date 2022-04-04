@@ -63,7 +63,7 @@ jobs:
                 name: context.repo.repo,
                 number: process.env.PR_NUMBER
                 headers: {
-                  Accept: application/vnd.github.merge-info-preview+json,
+                  Accept: "application/vnd.github.merge-info-preview+json"
                 },
               }
               const result = await github.graphql(query, variables)
