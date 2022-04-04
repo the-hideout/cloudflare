@@ -119,7 +119,7 @@ jobs:
                   console.log(message);
               // If there are any issues blocking deployment, throw an error and save the error message as an output
               } else {
-                  const message = `## ⚠️ Cannot proceed with deployment\n\nmergeStateStatus = ${mergeStateStatus} | commitStatus ${commitStatus} - FAIL`;
+                  const message = `### ⚠️ Cannot proceed with deployment\n\n- mergeStateStatus: \`${mergeStateStatus}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
                   core.setOutput('error', message);
                   throw new Error(message);
               }
