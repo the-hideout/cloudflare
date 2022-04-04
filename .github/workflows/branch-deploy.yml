@@ -84,6 +84,7 @@ jobs:
             const query = `query($owner:String!, $name:String!, $number:Int!) {
                     repository(owner:$owner, name:$name) {
                         pullRequest(number:$number) {
+                            reviewDecision
                             mergeStateStatus
                             commits(last: 1) {
                                 nodes {
@@ -109,17 +110,17 @@ jobs:
               // Make the GraphQL query
               const result = await github.graphql(query, variables)
 
-              // Grab the mergeStateStatus and commitStatus values from the GraphQL result
-              const mergeStateStatus = result.repository.pullRequest.mergeStateStatus;
+              // Grab the reviewDecision and commitStatus values from the GraphQL result
+              const reviewDecision = result.repository.pullRequest.reviewDecision;
               const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
 
               // If everything is OK, print a nice message
-              if (mergeStateStatus === "CLEAN" && commitStatus === "SUCCESS") {
+              if (reviewDecision === "APPROVED" && commitStatus === "SUCCESS") {
                   const message = "✔️ Merge is clean and all checks passed - OK";
                   console.log(message);
               // If there are any issues blocking deployment, throw an error and save the error message as an output
               } else {
-                  const message = `### ⚠️ Cannot proceed with deployment\n\n- mergeStateStatus: \`${mergeStateStatus}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
+                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
                   core.setOutput('error', message);
                   throw new Error(message);
               }
