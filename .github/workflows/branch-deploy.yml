@@ -35,6 +35,85 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check PR approval status
+        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
+        id : check-approval
+        with:
+            script: |
+              const query = `query($owner:String!, $name:String!, $number:Int!) {
+                    repository(owner:$owner, name:$name) {
+                        pullRequest(number:$number) {
+                            mergeStateStatus
+                            commits(last: 1) {
+                                nodes {
+                                    commit {
+                                        statusCheckRollup {
+                                            state
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }`;
+              const variables = {
+                owner: context.repo.owner,
+                name: context.repo.repo,
+                number: context.payload.pull_request.number
+              }
+              const result = await github.graphql(query, variables)
+
+              const mergeStateStatus = result.repository.pullRequest.mergeStateStatus;
+              const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
+
+              if (mergeStateStatus === "CLEAN" && commitStatus === "SUCCESS") {
+                  const message = "✔️ Merge is clean and all checks passed - OK";
+                  console.log(message);
+              } else {
+                  const message = `❌ mergeStateStatus = ${mergeStateStatus} | commitStatus ${commitStatus} - FAIL`;
+                  core.setOutput('error', message);
+                  throw new Error(message);
+              }
+
+      - name: Check PR Approval Failed
+        id: check-approval-failed
+        if: failure()
+        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
+        env:
+          message: ${{steps.check-approval.outputs.error}}
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
+            const { message } = process.env.message;
+            // check if message is null or empty
+            if (!message || message.length === 0) {
+              message = 'Unknown error, [check logs](' + log_url + ') for more details.'
+            }
+
+            const comment = `⚠️ Cannot proceed with branch deployment
+            
+            Message: ${message}
+
+            > This is likely due to missing PR approvals or CI checks not passing
+            `
+
+            github.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: comment
+            })
+            await github.reactions.createForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              content: '-1'
+            })
+            await github.reactions.deleteForIssueComment({
+              ...context.repo,
+              comment_id: ${{github.event.comment.id}},
+              reaction_id: ${{steps.prechecks.outputs.eyes}}
+            })
+
       - name: Check permissions and PR ref
         id: prechecks
         env:
