@@ -25,18 +25,15 @@ jobs:
       - id: env-vars
         name: Output environment variables
         run: echo "::set-output name=params::$(echo $(jq -n 'env'))"
-      - uses: khan/pull-request-comment-trigger@v1.1.0
+
+      # Validate the deploy trigger comment
+      - uses: khan/pull-request-comment-trigger@edab8d9ba7759221187ef7120592a6fbfada0d18 # pin@v1.1.0
         id: check
         with:
           trigger: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
           reaction: eyes
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Branch Deploy Comment Detected
-        if: steps.check.outputs.triggered == 'true'
-        env:
-          TRIGGERED: ${{ steps.check.outputs.triggered }}
-        run: 'echo "Triggered: $TRIGGERED"'
 
   prechecks:
     needs: [ params ]
@@ -128,8 +125,7 @@ jobs:
               const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
 
               // If everything is OK, print a nice message
-              //reviewDecision === "APPROVED" &&  disabled for now
-              if (commitStatus === "SUCCESS") {
+              if (reviewDecision === "APPROVED" && commitStatus === "SUCCESS") {
                   const message = "✔️ Merge is clean and all checks passed - OK";
                   console.log(message);
               // If there are any issues blocking deployment, throw an error and save the error message as an output
@@ -153,6 +149,7 @@ jobs:
             core.setOutput('ref', ref)
             core.setOutput('sha', pr.data.head.sha)
 
+      # If the pre-check fails, create a comment with details to post on the PR
       - name: Pre-Check-Failed
         id: precheck-failed
         if: failure()
@@ -194,10 +191,10 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
 
     steps:
-
+      # Create a deployment to attach to the pull request where it was triggered
       - name: create deployment
         id: create_deployment
-        uses: octokit/request-action@v2.x
+        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
         with:
           route: POST /repos/:repository/deployments
         env:
@@ -210,7 +207,7 @@ jobs:
 
       - name: set deployment status to in progress
         id: start_deployment
-        uses: octokit/request-action@v2.x
+        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
           mediaType: '{"previews": ["flash", "ant-man"]}'
@@ -284,7 +281,7 @@ jobs:
         with:
           ref: ${{ needs.prechecks.outputs.ref }}
 
-      - uses: hashicorp/setup-terraform@3d8debd658c92063839bc97da5c2427100420dec # pin@v1
+      - uses: hashicorp/setup-terraform@ed3a0531877aca392eb870f440d9ae7aba83a6bd # pin@v1
         with:
           terraform_version: 1.1.7
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
@@ -328,6 +325,7 @@ jobs:
               body: output
             })
 
+      # Raise a failure after posting a comment if anything went wrong in the Terraform Apply
       - name: Check Terraform output
         if: steps.apply.outcome == 'failure'
         run: exit 1
@@ -335,7 +333,7 @@ jobs:
       - name: set deployment status to success
         if: success()
         id: successful_deployment
-        uses: octokit/request-action@v2.x
+        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
           mediaType: '{"previews": ["ant-man"]}'
@@ -349,7 +347,7 @@ jobs:
 
       - name: set deployment status to failure
         id: failed_deployment
-        uses: octokit/request-action@v2.x
+        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
         if: failure()
         with:
           route: POST /repos/:repository/deployments/:deployment/statuses
