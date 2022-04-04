@@ -27,7 +27,7 @@ jobs:
       - uses: khan/pull-request-comment-trigger@v1.1.0
         id: check
         with:
-          trigger: ${{ fromJson(steps.params.outputs.params).DEPLOY_COMMAND }}
+          trigger: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
           reaction: eyes
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
