@@ -63,9 +63,13 @@ jobs:
                 name: context.repo.repo,
                 number: process.env.PR_NUMBER
                 headers: {
-                  Accept: application/vnd.github.merge-info-preview+json,
+                  Accept: "application/vnd.github.merge-info-preview+json"
                 },
               }
+
+              // Debug
+              console.log(variables)
+
               const result = await github.graphql(query, variables)
 
               const mergeStateStatus = result.repository.pullRequest.mergeStateStatus;
