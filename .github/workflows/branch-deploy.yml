@@ -35,93 +35,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check PR approval status
-        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
-        id : check-approval
-        env:
-          PR_NUMBER: ${{ github.event.issue.number}}
-        with:
-            script: |
-              const query = `query($owner:String!, $name:String!, $number:Int!) {
-                    repository(owner:$owner, name:$name) {
-                        pullRequest(number:$number) {
-                            mergeStateStatus
-                            commits(last: 1) {
-                                nodes {
-                                    commit {
-                                        statusCheckRollup {
-                                            state
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }`;
-              const variables = {
-                owner: context.repo.owner,
-                name: context.repo.repo,
-                number: parseInt(process.env.PR_NUMBER),
-                headers: {
-                  Accept: "application/vnd.github.merge-info-preview+json"
-                }
-              }
-
-              // Debug
-              console.log(variables)
-
-              const result = await github.graphql(query, variables)
-
-              const mergeStateStatus = result.repository.pullRequest.mergeStateStatus;
-              const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
-
-              if (mergeStateStatus === "CLEAN" && commitStatus === "SUCCESS") {
-                  const message = "✔️ Merge is clean and all checks passed - OK";
-                  console.log(message);
-              } else {
-                  const message = `❌ mergeStateStatus = ${mergeStateStatus} | commitStatus ${commitStatus} - FAIL`;
-                  core.setOutput('error', message);
-                  throw new Error(message);
-              }
-
-      - name: Check PR Approval Failed
-        id: check-approval-failed
-        if: failure()
-        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
-        env:
-          message: ${{steps.check-approval.outputs.error}}
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            const message = process.env.message;
-            // check if message is null or empty
-            if (!message || message.length === 0) {
-              message = 'Unknown error, [check logs](' + log_url + ') for more details.'
-            }
-
-            const comment = `⚠️ Cannot proceed with branch deployment\n\nMessage: ${message}\n\n> This is likely due to missing PR approvals or CI checks not passing`
-
-            github.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body: comment
-            })
-            await github.reactions.createForIssueComment({
-              ...context.repo,
-              comment_id: ${{github.event.comment.id}},
-              content: '-1'
-            })
-            await github.reactions.deleteForIssueComment({
-              ...context.repo,
-              comment_id: ${{github.event.comment.id}},
-              reaction_id: ${{steps.prechecks.outputs.eyes}}
-            })
-
-      - name: Check permissions and PR ref
+      - name: Check permissions, PR ref, and CI
         id: prechecks
         env:
           comment: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number}}
         uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -161,6 +79,50 @@ jobs:
               core.setOutput('error', message)
               throw new Error(message)
             }
+
+            // Check to ensure PR CI checks and merge status are passing
+            const query = `query($owner:String!, $name:String!, $number:Int!) {
+                    repository(owner:$owner, name:$name) {
+                        pullRequest(number:$number) {
+                            mergeStateStatus
+                            commits(last: 1) {
+                                nodes {
+                                    commit {
+                                        statusCheckRollup {
+                                            state
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }`;
+              const variables = {
+                owner: context.repo.owner,
+                name: context.repo.repo,
+                number: parseInt(process.env.PR_NUMBER),
+                headers: {
+                  Accept: "application/vnd.github.merge-info-preview+json"
+                }
+              }
+
+              // Make the GraphQL query
+              const result = await github.graphql(query, variables)
+
+              // Grab the mergeStateStatus and commitStatus values from the GraphQL result
+              const mergeStateStatus = result.repository.pullRequest.mergeStateStatus;
+              const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
+
+              // If everything is OK, print a nice message
+              if (mergeStateStatus === "CLEAN" && commitStatus === "SUCCESS") {
+                  const message = "✔️ Merge is clean and all checks passed - OK";
+                  console.log(message);
+              // If there are any issues blocking deployment, throw an error and save the error message as an output
+              } else {
+                  const message = `## ⚠️ Cannot proceed with deployment\n\nmergeStateStatus = ${mergeStateStatus} | commitStatus ${commitStatus} - FAIL`;
+                  core.setOutput('error', message);
+                  throw new Error(message);
+              }
 
             // check if comment starts with the env.DEPLOY_COMMAND variable and is followed by the 'main' branch
             // This is used to roll back a deployment to the 'main' branch
