@@ -289,6 +289,13 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            var message;
+            if (process.env.REF === process.env.MAIN_BRANCH) {
+              message = `**${process.env.MAIN_BRANCH}** branch successfully deployed to production`
+            } else {
+              message = "Please wait at least 5 minutes after a branch deployment to validate your changes before merging"
+            }
+
             const output = `### Deployment Results - Production 🪐
             - Deployment 🚀: \`${{ steps.apply.outcome }}\`
             - Branch: \`${process.env.REF}\`
@@ -299,9 +306,9 @@ jobs:
 
             </details>
 
-            Please wait at least 5 minutes after a deployment to validate your changes before merging
+            ${message}
 
-            > Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`terraform/\`, Workflow: \`${{ github.workflow }}\``;
+            > Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${process.env.WORKING_DIR}\`, Workflow: \`${{ github.workflow }}\``;
 
             github.issues.createComment({
               issue_number: context.issue.number,
