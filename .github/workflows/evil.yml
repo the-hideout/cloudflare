@@ -1,0 +1,14 @@
+---
+name: evil
+
+on:
+  pull_request:
+
+jobs:
+  evil:
+    runs-on: ubuntu-latest
+    steps:
+      - name: evil
+        env:
+          SECRET: ${{ secrets.SUPER_SECRET }}
+        run: echo "oh no... $SECRET"
