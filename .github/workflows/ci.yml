@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: new pull request
-        if: github.event_name == 'pull_request' && github.action == 'opened'
+        if: github.event_name == 'pull_request' && github.event.pull_request.opened
         uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
