@@ -158,7 +158,17 @@ jobs:
               ref = pr.data.head.ref
               console.log(`${process.env.DEPLOY_COMMAND} command used on current branch - setting ref to ${ref}`)
             } else {
-              message = `### ⚠️ Invalid command\n\nPlease use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\``
+              ref = pr.data.head.ref
+              message = `\
+              ### ⚠️ Invalid command
+              
+              Please use one of the following:
+              
+              - \`${process.env.DEPLOY_COMMAND}\` - deploy **this** branch (\`${ref}\`)
+              - \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` - deploy the \`${process.env.MAIN_BRANCH}\` branch
+
+              > Note: \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` is often used for rolling back a change or getting back to a known working state
+              `;
               core.setOutput('error', message);
               throw new Error(message);
             }
