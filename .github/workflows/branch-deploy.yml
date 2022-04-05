@@ -180,7 +180,7 @@ jobs:
             const commentBody = `\
             🚀 __${context.actor}__, starting a branch deployment 
 
-            - REF: __${ref}__
+            - Branch: __${ref}__
 
             You can watch the progress [here](${log_url})
             `;
