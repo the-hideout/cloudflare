@@ -87,3 +87,14 @@ resource "cloudflare_record" "market" {
   value   = "209.151.146.50"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
+
+### EXAMPLE ###
+resource "cloudflare_record" "example" {
+  name    = "example"
+  proxied = true
+  ttl     = 1
+  type    = "A"
+  value   = "209.151.146.50"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+### EXAMPLE ###
