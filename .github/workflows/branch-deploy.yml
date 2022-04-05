@@ -135,6 +135,11 @@ jobs:
                   const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> CI checks are passing but an approval is required before you can proceed with deployment`;
                   core.setOutput('error', message);
                   throw new Error(message);
+              // If the PR is approved but CI is failing
+              } else if (reviewDecision === "APPROVED" && commitStatus === "FAILURE") {
+                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> Your pull request is approved but CI checks are failing`;
+                  core.setOutput('error', message);
+                  throw new Error(message);
               // If there are any other errors blocking deployment, let the user know
               } else {
                   const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
@@ -153,7 +158,17 @@ jobs:
               ref = pr.data.head.ref
               console.log(`${process.env.DEPLOY_COMMAND} command used on current branch - setting ref to ${ref}`)
             } else {
-              message = `### ⚠️ Invalid command\n\nPlease use \`${process.env.DEPLOY_COMMAND}\` or \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\``
+              ref = pr.data.head.ref
+              message = `\
+              ### ⚠️ Invalid command
+              
+              Please use one of the following:
+              
+              - \`${process.env.DEPLOY_COMMAND}\` - deploy **this** branch (\`${ref}\`)
+              - \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` - deploy the \`${process.env.MAIN_BRANCH}\` branch
+
+              > Note: \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` is often used for rolling back a change or getting back to a known working state
+              `;
               core.setOutput('error', message);
               throw new Error(message);
             }
@@ -165,7 +180,7 @@ jobs:
             const commentBody = `\
             🚀 __${context.actor}__, starting a branch deployment 
 
-            - REF: __${ref}__
+            - Branch: __${ref}__
 
             You can watch the progress [here](${log_url})
             `;
