@@ -286,18 +286,31 @@ jobs:
         env:
           APPLY: "terraform ${{ steps.apply.outputs.stdout }}"
           REF: ${{ needs.prechecks.outputs.ref }}
+          APPLY_RESULT: ${{ steps.apply.outcome }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             var message;
-            if (process.env.REF === process.env.MAIN_BRANCH) {
-              message = `**${process.env.MAIN_BRANCH}** branch successfully deployed to production`
+            var deployStatus;
+            if (process.env.REF === process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "success") {
+              message = `Successfully deployed branch **${process.env.MAIN_BRANCH}** to **${process.env.DEPLOY_ENV}**`;
+              deployStatus = `\`${process.env.APPLY_RESULT}\` ✔️`
+            } else if (process.env.REF === process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "failure") {
+              message = `Failure when deploying branch **${process.env.MAIN_BRANCH}** to **${process.env.DEPLOY_ENV}**`;
+              deployStatus = `\`${process.env.APPLY_RESULT}\` ❌`
+            } else if (process.env.REF != process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "success") {
+              message = "Please wait at least 5 minutes after a successful branch deployment to validate your changes before merging";
+              deployStatus = `\`${process.env.APPLY_RESULT}\` ✔️`
+            } else if (process.env.REF != process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "failure") {
+              message = "Something went wrong during your branch deployment, please check the GitHub Actions logs for more details";
+              deployStatus = `\`${process.env.APPLY_RESULT}\` ❌`
             } else {
-              message = "Please wait at least 5 minutes after a branch deployment to validate your changes before merging"
+              message = "Warning: deployment status is unknown, please use caution";
+              deployStatus = `\`${process.env.APPLY_RESULT}\` ⚠️`
             }
 
             const output = `### Deployment Results - Production 🪐
-            - Deployment 🚀: \`${{ steps.apply.outcome }}\`
+            - Deployment 🚀: ${deployStatus}
             - Branch: \`${process.env.REF}\`
 
             <details><summary>Show Apply</summary>
