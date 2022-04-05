@@ -33,6 +33,7 @@ jobs:
         with:
           trigger: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
           reaction: eyes
+          prefix_only: true
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
