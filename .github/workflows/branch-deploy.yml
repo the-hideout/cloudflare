@@ -229,7 +229,7 @@ jobs:
           INPUT_REPOSITORY: ${{ github.repository }}
           INPUT_REF: ${{ needs.prechecks.outputs.ref }}
           INPUT_AUTO_MERGE: false
-          INPUT_ENVIRONMENT: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
+          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
           INPUT_REQUIRED_CONTEXTS: "[]"
 
       - name: set deployment status to in progress
@@ -242,7 +242,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           INPUT_REPOSITORY: ${{ github.repository }}
           INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
+          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
           INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           INPUT_STATE: in_progress
 
@@ -311,7 +311,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           INPUT_REPOSITORY: ${{ github.repository }}
           INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
+          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
           INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           INPUT_STATE: success
 
@@ -326,6 +326,6 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           INPUT_REPOSITORY: ${{ github.repository }}
           INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
+          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
           INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           INPUT_STATE: failure
