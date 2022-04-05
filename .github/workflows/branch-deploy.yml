@@ -135,6 +135,11 @@ jobs:
                   const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> CI checks are passing but an approval is required before you can proceed with deployment`;
                   core.setOutput('error', message);
                   throw new Error(message);
+              // If the PR is approved but CI is failing
+              } else if (reviewDecision === "APPROVED" && commitStatus === "FAILURE") {
+                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> Your pull request is approved but CI checks are failing`;
+                  core.setOutput('error', message);
+                  throw new Error(message);
               // If there are any other errors blocking deployment, let the user know
               } else {
                   const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
