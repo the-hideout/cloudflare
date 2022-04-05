@@ -29,7 +29,7 @@ To deploy a change to our CF infrastructure, simply do the following:
 1. Obtain a review confirming your changes
 1. Branch deploy your change to production via a comment on your pull request - [branch deploy example](https://github.com/the-hideout/cloudflare/pull/11)
 
-   > Simply comment `.deploy` on your PR to deploy your changes. If anything goes wrong, or you need to rollback, comment `.deploy main` to re-deploy the `main` branch to production
+   > Simply comment `.deploy` on your PR to deploy your changes. If anything goes wrong, or you need to rollback, comment `.deploy main` to re-deploy the `main` branch to production - Here is another example showing how PR approvals and rollbacks work: [example](https://github.com/the-hideout/cloudflare/pull/19)
 
 1. Wait at least 5 minutes to ensure your changes are working as expected
 1. Merge! Upon merging, your changes will be automatically deployed to production (again) ✨
