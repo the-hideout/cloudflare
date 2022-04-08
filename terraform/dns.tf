@@ -18,25 +18,16 @@ resource "cloudflare_record" "www" {
 
 resource "cloudflare_record" "api" {
   name    = "api"
-  proxied = true
+  proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "prod-api-tarkov-dev.graphcdn.app"
+  value   = "ecp.map.fastly.net"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
 resource "cloudflare_record" "dev_api" {
   name    = "dev-api"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  value   = "dev-api-tarkov-dev.graphcdn.app"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_record" "development_api" {
-  name    = "development-api"
-  proxied = true
+  proxied = false
   ttl     = 1
   type    = "CNAME"
   value   = "ecp.map.fastly.net"
@@ -87,14 +78,3 @@ resource "cloudflare_record" "market" {
   value   = "209.151.146.50"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
-
-### EXAMPLE ###
-resource "cloudflare_record" "example" {
-  name    = "example"
-  proxied = true
-  ttl     = 1
-  type    = "A"
-  value   = "209.151.146.50"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-### EXAMPLE ###
