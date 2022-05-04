@@ -8,45 +8,36 @@ env:
   WORKING_DIR: terraform/
 
 jobs:
-
-  branch-deploy-checks:
-    name: branch-deploy-checks
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
-    outputs:
-      ref: ${{ steps.branch-deploy.outputs.ref }}
-      continue: ${{ steps.branch-deploy.outputs.continue }}
-      noop: ${{ steps.branch-deploy.outputs.noop }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
 
     steps:
       - name: branch-deploy
         id: branch-deploy
         uses: GrantBirki/branch-deploy@dceee35f469f925d5f713146e18f2dcca7b9fa88 # pin@v1.1.0
 
-  deploy:
-    name: deploy
-    runs-on: ubuntu-latest
-    needs: [ branch-deploy-checks ]
-    if: needs.branch-deploy-checks.outputs.continue == 'true'
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIR }}
-
-    steps:
       - name: Checkout
+        if: steps.branch-deploy.outputs.continue == 'true'
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # pin@v2
         with:
-          ref: ${{ needs.branch-deploy-checks.outputs.ref }}
+          ref: ${{ steps.branch-deploy.outputs.ref }}
 
       - uses: hashicorp/setup-terraform@ed3a0531877aca392eb870f440d9ae7aba83a6bd # pin@v1
+        if: steps.branch-deploy.outputs.continue == 'true'
         with:
           terraform_version: 1.1.7
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform init
+        if: steps.branch-deploy.outputs.continue == 'true'
         run: terraform init
 
       - name: Terraform plan
-        if: needs.branch-deploy-checks.outputs.noop == 'true'
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' }}
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         id: plan
@@ -54,7 +45,7 @@ jobs:
         continue-on-error: true
 
       - name: Terraform apply
-        if: needs.branch-deploy-checks.outputs.noop != 'true'
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         id: apply
@@ -62,7 +53,7 @@ jobs:
         continue-on-error: true
 
       - name: Terraform plan output
-        if: needs.branch-deploy-checks.outputs.noop == 'true'
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' }}
         run: |
           TF_OUTPUT="\`\`\`terraform\n${{ steps.plan.outputs.stdout }}\n\`\`\`"
           echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
@@ -70,7 +61,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Terraform apply output
-        if: needs.branch-deploy-checks.outputs.noop != 'true'
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         run: |
           TF_OUTPUT="\`\`\`terraform\n${{ steps.apply.outputs.stdout }}\n\`\`\`"
           echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
@@ -78,9 +69,9 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Check Terraform plan output
-        if: ${{ needs.branch-deploy-checks.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
         run: exit 1
 
       - name: Check Terraform apply output
-        if: ${{ needs.branch-deploy-checks.outputs.noop != 'true' && steps.apply.outcome == 'failure' }}
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' && steps.apply.outcome == 'failure' }}
         run: exit 1
