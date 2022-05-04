@@ -4,268 +4,38 @@ on:
   issue_comment:
     types: [ created ]
 
-# Custom configration to define branch-deploy commands
 env:
-  WORKING_DIR: "terraform/"
-  DEPLOY_COMMAND: ".deploy"
-  MAIN_BRANCH: "main"
-  DEPLOY_ENV: "production"
+  WORKING_DIR: terraform/
 
 jobs:
-  # The 'params' job makes certain env vars available to parts of the GitHub Actions workflow that generally doesn't support env vars
-  # https://github.com/actions/runner/issues/480#issuecomment-1055373623
-  params:
-    name: Setup env
+
+  branch-deploy-checks:
+    name: branch-deploy-checks
     runs-on: ubuntu-latest
     outputs:
-      params: ${{ steps.env-vars.outputs.params }}
-      triggered: ${{ steps.check.outputs.triggered }}
-    steps:
-      - name: install jq
-        run: pip install jq
-      - id: env-vars
-        name: Output environment variables
-        run: echo "::set-output name=params::$(echo $(jq -n 'env'))"
-
-      # Validate the deploy trigger comment
-      - uses: khan/pull-request-comment-trigger@edab8d9ba7759221187ef7120592a6fbfada0d18 # pin@v1.1.0
-        id: check
-        with:
-          trigger: ${{ fromJson(steps.env-vars.outputs.params).DEPLOY_COMMAND }}
-          reaction: eyes
-          prefix_only: true
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-
-  prechecks:
-    needs: [ params ]
-    if: github.event.issue.pull_request != null && needs.params.outputs.triggered == 'true'
-    outputs:
-      ref: ${{steps.prechecks.outputs.ref}}
-      eyes: ${{steps.prechecks.outputs.eyes}}
-    runs-on: ubuntu-latest
+      ref: ${{ steps.branch-deploy.outputs.ref }}
+      continue: ${{ steps.branch-deploy.outputs.continue }}
+      noop: ${{ steps.branch-deploy.outputs.noop }}
 
     steps:
-      - name: Check permissions, PR ref, and CI
-        id: prechecks
-        env:
-          COMMENT: ${{ github.event.comment.body }}
-          PR_NUMBER: ${{ github.event.issue.number}}
-        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const COMMENT = process.env.COMMENT;
-            const reactionRes = await github.reactions.createForIssueComment({
-              ...context.repo,
-              comment_id: ${{github.event.comment.id}},
-              content: 'eyes'
-            })
-            core.setOutput('eyes', reactionRes.data.id)
-            const permissionRes = await github.repos.getCollaboratorPermissionLevel(
-              {
-                ...context.repo,
-                username: context.actor
-              }
-            )
-            if (permissionRes.status !== 200) {
-              message = 'Permission check returns non-200 status: ${permissionRes.status}'
-              core.setOutput('error', message)
-              throw new Error(message)
-            }
-            const actorPermission = permissionRes.data.permission
-            if (!['admin', 'write'].includes(actorPermission)) {
-                message = '👋  __' + context.actor + '__, seems as if you have not admin/write permission to branch-deploy this PR, permissions: ${actorPermission}'
-                core.setOutput('error', message)
-                throw new Error(message)
-            }
-            pr = await github.pulls.get(
-              {
-                ...context.repo,
-                pull_number: context.issue.number
-              }
-            )
-            if (pr.status !== 200) {
-              message = 'Could not retrieve PR info: ${permissionRes.status}'
-              core.setOutput('error', message)
-              throw new Error(message)
-            }
+      - name: branch-deploy
+        id: branch-deploy
+        uses: GrantBirki/branch-deploy@dceee35f469f925d5f713146e18f2dcca7b9fa88 # pin@v1.1.0
 
-            // Check to ensure PR CI checks are passing and the PR has been reviewed
-            // mergeStateStatus is in the query below but not used at this time
-            const query = `query($owner:String!, $name:String!, $number:Int!) {
-                    repository(owner:$owner, name:$name) {
-                        pullRequest(number:$number) {
-                            reviewDecision
-                            mergeStateStatus
-                            commits(last: 1) {
-                                nodes {
-                                    commit {
-                                        statusCheckRollup {
-                                            state
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }`;
-              // Note: https://docs.github.com/en/graphql/overview/schema-previews#merge-info-preview (mergeStateStatus)
-              const variables = {
-                owner: context.repo.owner,
-                name: context.repo.repo,
-                number: parseInt(process.env.PR_NUMBER),
-                headers: {
-                  Accept: "application/vnd.github.merge-info-preview+json"
-                }
-              }
-
-              // Make the GraphQL query
-              const result = await github.graphql(query, variables)
-
-              // Grab the reviewDecision and commitStatus values from the GraphQL result
-              const reviewDecision = result.repository.pullRequest.reviewDecision;
-              const commitStatus = result.repository.pullRequest.commits.nodes[0].commit.statusCheckRollup.state;
-
-              // If everything is OK, print a nice message
-              if (reviewDecision === "APPROVED" && commitStatus === "SUCCESS") {
-                  const message = "✔️ PR is approved and all CI checks passed - OK";
-                  console.log(message);
-              // If CI is passing but the PR is missing an approval, let the user know
-              } else if (reviewDecision === "REVIEW_REQUIRED" && commitStatus === "SUCCESS") {
-                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> CI checks are passing but an approval is required before you can proceed with deployment`;
-                  core.setOutput('error', message);
-                  throw new Error(message);
-              // If the PR is approved but CI is failing
-              } else if (reviewDecision === "APPROVED" && commitStatus === "FAILURE") {
-                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> Your pull request is approved but CI checks are failing`;
-                  core.setOutput('error', message);
-                  throw new Error(message);
-              // If there are any other errors blocking deployment, let the user know
-              } else {
-                  const message = `### ⚠️ Cannot proceed with deployment\n\n- reviewDecision: \`${reviewDecision}\`\n- commitStatus: \`${commitStatus}\`\n\n> This is usually caused by missing PR approvals or CI checks failing`;
-                  core.setOutput('error', message);
-                  throw new Error(message);
-              }
-
-            // check if comment starts with the env.DEPLOY_COMMAND variable followed by the 'main' branch or if this is for the current branch
-            var ref;
-            const regexCommandWithMain = /^\.deploy\s*(main)$/
-            const regexCommandWithoutParameters = /^\.deploy\s*$/
-            if (regexCommandWithMain.test(COMMENT)) {
-              ref = process.env.MAIN_BRANCH
-              console.log(`${process.env.DEPLOY_COMMAND} command used with 'main' branch - setting ref to ${ref}`)
-            } else if (regexCommandWithoutParameters.test(COMMENT)) {
-              ref = pr.data.head.ref
-              console.log(`${process.env.DEPLOY_COMMAND} command used on current branch - setting ref to ${ref}`)
-            } else {
-              ref = pr.data.head.ref
-              message = `\
-              ### ⚠️ Invalid command
-              
-              Please use one of the following:
-              
-              - \`${process.env.DEPLOY_COMMAND}\` - deploy **this** branch (\`${ref}\`)
-              - \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` - deploy the \`${process.env.MAIN_BRANCH}\` branch
-
-              > Note: \`${process.env.DEPLOY_COMMAND} ${process.env.MAIN_BRANCH}\` is often used for rolling back a change or getting back to a known working state
-              `;
-              core.setOutput('error', message);
-              throw new Error(message);
-            }
-
-            core.setOutput('ref', ref)
-
-            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
-
-            const commentBody = `\
-            🚀 __${context.actor}__, starting a branch deployment 
-
-            - Branch: __${ref}__
-
-            You can watch the progress [here](${log_url})
-            `;
-
-            await github.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            })
-
-      # If the pre-check fails, create a comment with details to post on the PR
-      - name: Pre-Check-Failed
-        id: precheck-failed
-        if: failure()
-        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
-        env:
-          message: ${{steps.prechecks.outputs.error}}
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const log_url = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`
-            const { message } = process.env;
-            // check if message is null or empty
-            if (!message || message.length === 0) {
-              message = 'Unknown error, [check logs](' + log_url + ') for more details.'
-            }
-            github.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body: message
-            })
-            await github.reactions.createForIssueComment({
-              ...context.repo,
-              comment_id: ${{github.event.comment.id}},
-              content: '-1'
-            })
-            await github.reactions.deleteForIssueComment({
-              ...context.repo,
-              comment_id: ${{github.event.comment.id}},
-              reaction_id: ${{steps.prechecks.outputs.eyes}}
-            })
-
-  branch-deploy:
-    name: "branch deploy"
-    if: needs.params.outputs.triggered == 'true'
-    needs: [ prechecks, params ]
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
+    needs: [ branch-deploy-checks ]
+    if: needs.branch-deploy-checks.outputs.continue == 'true'
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
 
     steps:
-      # Create a deployment to attach to the pull request where it was triggered
-      - name: create deployment
-        id: create_deployment
-        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
-        with:
-          route: POST /repos/:repository/deployments
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          INPUT_REPOSITORY: ${{ github.repository }}
-          INPUT_REF: ${{ needs.prechecks.outputs.ref }}
-          INPUT_AUTO_MERGE: false
-          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
-          INPUT_REQUIRED_CONTEXTS: "[]"
-
-      - name: set deployment status to in progress
-        id: start_deployment
-        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
-        with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          mediaType: '{"previews": ["flash", "ant-man"]}'
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          INPUT_REPOSITORY: ${{ github.repository }}
-          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
-          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          INPUT_STATE: in_progress
-
       - name: Checkout
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # pin@v2
         with:
-          ref: ${{ needs.prechecks.outputs.ref }}
+          ref: ${{ needs.branch-deploy-checks.outputs.ref }}
 
       - uses: hashicorp/setup-terraform@ed3a0531877aca392eb870f440d9ae7aba83a6bd # pin@v1
         with:
@@ -275,93 +45,29 @@ jobs:
       - name: Terraform init
         run: terraform init
 
-      - name: Terraform apply
+      - name: Terraform plan
+        if: needs.branch-deploy-checks.outputs.noop == 'true'
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-        id: apply
+        id: terraform
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - name: Terraform apply
+        if: needs.branch-deploy-checks.outputs.noop != 'true'
+        env:
+          TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+        id: terraform
         run: terraform apply -no-color -auto-approve
         continue-on-error: true
 
-      # Post comment on PR with development plan info
-      - uses: actions/github-script@5d03ada4b0a753e9460b312e61cc4f8fdeacf163 # pin@0.9.0
-        env:
-          APPLY: "terraform ${{ steps.apply.outputs.stdout }}"
-          REF: ${{ needs.prechecks.outputs.ref }}
-          APPLY_RESULT: ${{ steps.apply.outcome }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            var message;
-            var deployStatus;
-            if (process.env.REF === process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "success") {
-              message = `Successfully deployed branch **${process.env.MAIN_BRANCH}** to **${process.env.DEPLOY_ENV}**`;
-              deployStatus = `\`${process.env.APPLY_RESULT}\` ✔️`
-            } else if (process.env.REF === process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "failure") {
-              message = `Failure when deploying branch **${process.env.MAIN_BRANCH}** to **${process.env.DEPLOY_ENV}**`;
-              deployStatus = `\`${process.env.APPLY_RESULT}\` ❌`
-            } else if (process.env.REF != process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "success") {
-              message = "Please wait at least 5 minutes after a successful branch deployment to validate your changes before merging";
-              deployStatus = `\`${process.env.APPLY_RESULT}\` ✔️`
-            } else if (process.env.REF != process.env.MAIN_BRANCH && process.env.APPLY_RESULT === "failure") {
-              message = "Something went wrong during your branch deployment, please check the GitHub Actions logs for more details";
-              deployStatus = `\`${process.env.APPLY_RESULT}\` ❌`
-            } else {
-              message = "Warning: deployment status is unknown, please use caution";
-              deployStatus = `\`${process.env.APPLY_RESULT}\` ⚠️`
-            }
+      - name: Terraform output
+        run: |
+          TF_OUTPUT="\`\`\`terraform\n${{ steps.terraform.outputs.stdout }}\n\`\`\`"
+          echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
+          echo "$TF_OUTPUT" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
-            const output = `### Deployment Results - Production 🪐
-            - Deployment 🚀: ${deployStatus}
-            - Branch: \`${process.env.REF}\`
-
-            <details><summary>Show Apply</summary>
-
-            \`\`\`${process.env.APPLY}\`\`\`
-
-            </details>
-
-            ${message}
-
-            > Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${process.env.WORKING_DIR}\`, Workflow: \`${{ github.workflow }}\``;
-
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-      # Raise a failure after posting a comment if anything went wrong in the Terraform Apply
       - name: Check Terraform output
-        if: steps.apply.outcome == 'failure'
+        if: steps.terraform.outcome == 'failure'
         run: exit 1
-
-      - name: set deployment status to success
-        if: success()
-        id: successful_deployment
-        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
-        with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          mediaType: '{"previews": ["ant-man"]}'
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          INPUT_REPOSITORY: ${{ github.repository }}
-          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
-          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          INPUT_STATE: success
-
-      - name: set deployment status to failure
-        id: failed_deployment
-        uses: octokit/request-action@971ad48f9c40ed001c41c2671b1e6e8e8165d5af # pin@v2.x
-        if: failure()
-        with:
-          route: POST /repos/:repository/deployments/:deployment/statuses
-          mediaType: '{"previews": ["ant-man"]}'
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          INPUT_REPOSITORY: ${{ github.repository }}
-          INPUT_DEPLOYMENT: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          INPUT_ENVIRONMENT: ${{ env.DEPLOY_ENV }}
-          INPUT_LOG_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          INPUT_STATE: failure
