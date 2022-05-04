@@ -49,7 +49,7 @@ jobs:
         if: needs.branch-deploy-checks.outputs.noop == 'true'
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-        id: terraform
+        id: plan
         run: terraform plan -no-color
         continue-on-error: true
 
@@ -57,17 +57,30 @@ jobs:
         if: needs.branch-deploy-checks.outputs.noop != 'true'
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-        id: terraform
+        id: apply
         run: terraform apply -no-color -auto-approve
         continue-on-error: true
 
-      - name: Terraform output
+      - name: Terraform plan output
+        if: needs.branch-deploy-checks.outputs.noop == 'true'
         run: |
-          TF_OUTPUT="\`\`\`terraform\n${{ steps.terraform.outputs.stdout }}\n\`\`\`"
+          TF_OUTPUT="\`\`\`terraform\n${{ steps.plan.outputs.stdout }}\n\`\`\`"
           echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
           echo "$TF_OUTPUT" >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
-      - name: Check Terraform output
-        if: steps.terraform.outcome == 'failure'
+      - name: Terraform apply output
+        if: needs.branch-deploy-checks.outputs.noop != 'true'
+        run: |
+          TF_OUTPUT="\`\`\`terraform\n${{ steps.apply.outputs.stdout }}\n\`\`\`"
+          echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
+          echo "$TF_OUTPUT" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Check Terraform plan output
+        if: ${{ needs.branch-deploy-checks.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
+        run: exit 1
+
+      - name: Check Terraform apply output
+        if: $ {{ needs.branch-deploy-checks.outputs.noop != 'true' && steps.apply.outcome == 'failure' }}
         run: exit 1
