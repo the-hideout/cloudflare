@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: branch-deploy
         id: branch-deploy
-        uses: GrantBirki/branch-deploy@dceee35f469f925d5f713146e18f2dcca7b9fa88 # pin@v1.1.0
+        uses: GrantBirki/branch-deploy@333ba95ed89be2efe1cd49dc2781c8556a742eba # pin@v1.3.0
 
       - name: Checkout
         if: steps.branch-deploy.outputs.continue == 'true'
