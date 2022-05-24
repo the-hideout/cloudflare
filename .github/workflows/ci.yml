@@ -13,36 +13,16 @@ env:
 
 jobs:
   new-pr:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
 
     steps:
-      - name: new pull request
-        if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        uses: actions/github-script@f05a81df23035049204b043b50c3322045ce7eb3 # pin@v3
+      # Comment on new PR requests with deployment instructions
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # pin@v3.0.2
+      - name: comment
+        uses: GrantBirki/comment@5f428382792637d756694f5e0ca49ba56354125c # pin@v2.0.0
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const commentBody = `\
-            ### 👋 Thanks for opening a pull request!
-
-            If you are new, please check out the [deployment process](https://github.com/the-hideout/cloudflare#deployment-) to understand how to deploy this pull request. A trimmed down summary will be listed below:
-
-            1. 🧪 Run a noop deployment with \`.deploy noop\` as a comment on this PR
-            1. 👀 Observe the CI and \`noop\` output on this pull request to ensure it is passing and doing what it is supposed to do
-            1. ✔️ Obtain an approval/review on this pull request
-            1. 🚀 Branch deploy your pull request to production - [example](https://github.com/the-hideout/cloudflare/pull/11)
-
-                > Comment \`.deploy\` on this pull request to trigger a deploy. If anything goes wrong, rollback with \`.deploy main\`
-
-            1. 🎉 Merge!
-            `
-
-            await github.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            })
+          file: .github/new-pr-comment.md
 
   deploy:
     if: github.event_name == 'push'
