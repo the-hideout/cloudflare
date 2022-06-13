@@ -12,6 +12,7 @@ This repository uses Terraform to manage the configration and state for all supp
 - [`DNS`](terraform/dns.tf)
 - [`Zone Settings`](terraform/zone_settings.tf)
 - [`Rate Limits + Some Security Settings`](terraform/security.tf)
+- [`Page Rules`](terraform/page_rules.tf)
 - More to come!
 
 ## Usage 🔨
