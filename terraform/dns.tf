@@ -78,3 +78,12 @@ resource "cloudflare_record" "market" {
   value   = "209.151.146.50"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
+
+resource "cloudflare_record" "cache" {
+    name        = "cache"
+    proxied     = true
+    ttl         = 1
+    type        = "A"
+    value       = "20.231.196.38"
+    zone_id = var.CLOUDFLARE_ZONE_ID
+}
