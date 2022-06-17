@@ -46,7 +46,7 @@ resource "cloudflare_record" "assets" {
 resource "cloudflare_record" "manager" {
   name    = "manager"
   proxied = false
-  ttl     = 240
+  ttl     = 1
   type    = "A"
   value   = "20.115.107.210"
   zone_id = var.CLOUDFLARE_ZONE_ID
@@ -54,7 +54,7 @@ resource "cloudflare_record" "manager" {
 
 resource "cloudflare_record" "status" {
   name    = "status"
-  proxied = false
+  proxied = true
   ttl     = 1
   type    = "A"
   value   = "20.228.137.173"
