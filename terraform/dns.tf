@@ -45,7 +45,7 @@ resource "cloudflare_record" "assets" {
 
 resource "cloudflare_record" "manager" {
   name    = "manager"
-  proxied = false
+  proxied = true
   ttl     = 1
   type    = "A"
   value   = "20.115.107.210"
@@ -80,10 +80,10 @@ resource "cloudflare_record" "market" {
 }
 
 resource "cloudflare_record" "cache" {
-    name        = "cache"
-    proxied     = true
-    ttl         = 1
-    type        = "A"
-    value       = "20.231.196.38"
-    zone_id = var.CLOUDFLARE_ZONE_ID
+  name    = "cache"
+  proxied = true
+  ttl     = 1
+  type    = "A"
+  value   = "20.231.196.38"
+  zone_id = var.CLOUDFLARE_ZONE_ID
 }
