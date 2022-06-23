@@ -73,7 +73,7 @@ resource "cloudflare_record" "socket" {
 resource "cloudflare_record" "market" {
   name    = "market"
   proxied = true
-  ttl     = 60
+  ttl     = 1
   type    = "A"
   value   = "209.151.146.50"
   zone_id = var.CLOUDFLARE_ZONE_ID
