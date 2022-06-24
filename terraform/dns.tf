@@ -72,7 +72,7 @@ resource "cloudflare_record" "socket" {
 
 resource "cloudflare_record" "market" {
   name    = "market"
-  proxied = true
+  proxied = false
   ttl     = 61
   type    = "A"
   value   = "209.151.146.50"
