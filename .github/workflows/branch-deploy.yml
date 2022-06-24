@@ -60,16 +60,20 @@ jobs:
 
       - name: Terraform plan output
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' }}
+        env:
+          TF_STDOUT: ${{ steps.plan.outputs.stdout }}
         run: |
-          TF_OUTPUT="\`\`\`terraform\n${{ steps.plan.outputs.stdout }}\n\`\`\`"
+          TF_OUTPUT="\`\`\`terraform\n${TF_STDOUT}\n\`\`\`"
           echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
           echo "$TF_OUTPUT" >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Terraform apply output
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
+        env:
+          TF_STDOUT: ${{ steps.apply.outputs.stdout }}
         run: |
-          TF_OUTPUT="\`\`\`terraform\n${{ steps.apply.outputs.stdout }}\n\`\`\`"
+          TF_OUTPUT="\`\`\`terraform\n${TF_STDOUT}\n\`\`\`"
           echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
           echo "$TF_OUTPUT" >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
