@@ -1,7 +1,7 @@
 resource "cloudflare_rate_limit" "tarkov_dev" {
   bypass_url_patterns = []
   description         = "API"
-  disabled            = false
+  disabled            = true
   period              = 10
   threshold           = 100
   zone_id             = var.CLOUDFLARE_ZONE_ID
