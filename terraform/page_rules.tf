@@ -40,9 +40,9 @@ resource "cloudflare_page_rule" "images" {
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    browser_cache_ttl   = "31536000"
-    cache_level         = "cache_everything"
-    edge_cache_ttl      = 2678400
+    browser_cache_ttl = "31536000"
+    cache_level       = "cache_everything"
+    edge_cache_ttl    = 2678400
   }
 }
 
@@ -53,9 +53,9 @@ resource "cloudflare_page_rule" "fonts" {
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    browser_cache_ttl   = "31536000"
-    cache_level         = "cache_everything"
-    edge_cache_ttl      = 2678400
+    browser_cache_ttl = "31536000"
+    cache_level       = "cache_everything"
+    edge_cache_ttl    = 2678400
   }
 }
 
@@ -66,8 +66,8 @@ resource "cloudflare_page_rule" "data_json" {
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    browser_cache_ttl   = "86400"
-    cache_level         = "cache_everything"
-    edge_cache_ttl      = 86400
+    browser_cache_ttl = "86400"
+    cache_level       = "cache_everything"
+    edge_cache_ttl    = 86400
   }
 }
