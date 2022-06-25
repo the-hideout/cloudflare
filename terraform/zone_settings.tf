@@ -9,6 +9,8 @@
 # - Minify
 # - etc...
 
+# see all values here: https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/zone_settings_override
+
 resource "cloudflare_zone_settings_override" "tarkov_dev" {
   zone_id = var.CLOUDFLARE_ZONE_ID
   settings {
@@ -27,12 +29,15 @@ resource "cloudflare_zone_settings_override" "tarkov_dev" {
     opportunistic_onion      = "on"
     websockets               = "on"
     zero_rtt                 = "on"
+    webp                     = "on"
+
 
     # String Values
     security_level  = "medium"
     cache_level     = "aggressive"
     min_tls_version = "1.0"
     ssl             = "flexible" # needed for S3 backend assets
+    polish          = "lossy"
 
     # Integer Values
     browser_cache_ttl = 691200
