@@ -1,5 +1,5 @@
 resource "cloudflare_zone" "tarkov_dev" {
-  plan = "free"
+  plan = "pro"
   type = "full"
   zone = "tarkov.dev"
 }
