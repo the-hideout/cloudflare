@@ -22,8 +22,20 @@ resource "cloudflare_page_rule" "status_services" {
   }
 }
 
-resource "cloudflare_page_rule" "manager_service" {
+resource "cloudflare_page_rule" "status_custom_cache" {
   priority = 3
+  status   = "active"
+  target   = "status.tarkov.dev/api/status-page/heartbeat/api"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+
+  actions {
+    cache_level         = "cache_everything"
+    ssl                 = "strict"
+  }
+}
+
+resource "cloudflare_page_rule" "manager_service" {
+  priority = 4
   status   = "active"
   target   = "manager.tarkov.dev/*"
   zone_id  = var.CLOUDFLARE_ZONE_ID
@@ -34,7 +46,7 @@ resource "cloudflare_page_rule" "manager_service" {
 }
 
 resource "cloudflare_page_rule" "images" {
-  priority = 6
+  priority = 7
   status   = "active"
   target   = "tarkov.dev/images/*"
   zone_id  = var.CLOUDFLARE_ZONE_ID
@@ -47,7 +59,7 @@ resource "cloudflare_page_rule" "images" {
 }
 
 resource "cloudflare_page_rule" "fonts" {
-  priority = 5
+  priority = 6
   status   = "active"
   target   = "tarkov.dev/fonts/*"
   zone_id  = var.CLOUDFLARE_ZONE_ID
@@ -60,7 +72,7 @@ resource "cloudflare_page_rule" "fonts" {
 }
 
 resource "cloudflare_page_rule" "data_json" {
-  priority = 4
+  priority = 5
   status   = "active"
   target   = "tarkov.dev/data/*.json"
   zone_id  = var.CLOUDFLARE_ZONE_ID
