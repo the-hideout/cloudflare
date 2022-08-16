@@ -9,6 +9,12 @@ resource "cloudflare_ruleset" "security_response_headers" {
   rules {
     action = "rewrite"
     action_parameters {
+      # Note: headers must be in alphabetical order or you will have endless terraform plans changing state
+      headers {
+        name      = "Content-Security-Policy"
+        value     = "img-src 'self' https://assets.tarkov.dev data: https://images.weserv.nl; style-src 'self' https://tarkov.dev https://discord.com 'unsafe-inline'; font-src 'self' https://tarkov.dev https://discord.com;"
+        operation = "set"
+      }
       headers {
         name      = "X-Frame-Options"
         value     = "DENY"
@@ -17,11 +23,6 @@ resource "cloudflare_ruleset" "security_response_headers" {
       headers {
         name      = "X-XSS-Protection"
         value     = "1; mode=block"
-        operation = "set"
-      }
-      headers {
-        name      = "Content-Security-Policy"
-        value     = "img-src 'self' https://assets.tarkov.dev data: https://images.weserv.nl; style-src 'self' https://tarkov.dev https://discord.com 'unsafe-inline'; font-src 'self' https://tarkov.dev https://discord.com;"
         operation = "set"
       }
     }
