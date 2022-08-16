@@ -21,7 +21,7 @@ resource "cloudflare_ruleset" "security_response_headers" {
       }
       headers {
         name      = "Content-Security-Policy"
-        value     = "img-src 'self' https://assets.tarkov.dev data: https://images.weserv.nl; style-src 'self' https://tarkov.dev https://discord.com;"
+        value     = "img-src 'self' https://assets.tarkov.dev data: https://images.weserv.nl; style-src 'self' https://tarkov.dev https://discord.com 'unsafe-inline'; font-src 'self' https://tarkov.dev https://discord.com;"
         operation = "set"
       }
     }
