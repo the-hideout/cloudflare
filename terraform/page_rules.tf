@@ -29,8 +29,8 @@ resource "cloudflare_page_rule" "status_custom_cache" {
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    cache_level         = "cache_everything"
-    ssl                 = "strict"
+    cache_level = "cache_everything"
+    ssl         = "strict"
   }
 }
 
