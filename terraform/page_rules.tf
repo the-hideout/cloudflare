@@ -1,3 +1,15 @@
+resource "cloudflare_page_rule" "www_redirect" {
+  priority = 1
+  status   = "active"
+  target   = "cache.tarkov.dev/*"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+
+  actions {
+    cache_level = "cache_everything"
+    ssl         = "strict"
+  }
+}
+
 resource "cloudflare_page_rule" "cache_service" {
   priority = 1
   status   = "active"
@@ -45,16 +57,16 @@ resource "cloudflare_page_rule" "manager_service" {
   }
 }
 
-resource "cloudflare_page_rule" "images" {
-  priority = 7
+resource "cloudflare_page_rule" "data_json" {
+  priority = 5
   status   = "active"
-  target   = "tarkov.dev/images/*"
+  target   = "tarkov.dev/data/*.json"
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    browser_cache_ttl = "31536000"
+    browser_cache_ttl = "86400"
     cache_level       = "cache_everything"
-    edge_cache_ttl    = 2678400
+    edge_cache_ttl    = 86400
   }
 }
 
@@ -71,15 +83,15 @@ resource "cloudflare_page_rule" "fonts" {
   }
 }
 
-resource "cloudflare_page_rule" "data_json" {
-  priority = 5
+resource "cloudflare_page_rule" "images" {
+  priority = 7
   status   = "active"
-  target   = "tarkov.dev/data/*.json"
+  target   = "tarkov.dev/images/*"
   zone_id  = var.CLOUDFLARE_ZONE_ID
 
   actions {
-    browser_cache_ttl = "86400"
+    browser_cache_ttl = "31536000"
     cache_level       = "cache_everything"
-    edge_cache_ttl    = 86400
+    edge_cache_ttl    = 2678400
   }
 }
