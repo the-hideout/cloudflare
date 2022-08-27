@@ -97,3 +97,14 @@ resource "cloudflare_page_rule" "images" {
     edge_cache_ttl    = 2678400
   }
 }
+
+resource "cloudflare_page_rule" "socket_service" {
+  priority = 9
+  status   = "active"
+  target   = "socket.tarkov.dev/*"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+
+  actions {
+    ssl = "strict"
+  }
+}
