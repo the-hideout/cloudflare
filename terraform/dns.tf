@@ -66,7 +66,7 @@ resource "cloudflare_record" "socket" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "hideout-socket-server.herokuapp.com"
+  value   = "tarkov-socket-server-production.up.railway.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
