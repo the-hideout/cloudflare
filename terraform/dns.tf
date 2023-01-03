@@ -84,6 +84,6 @@ resource "cloudflare_record" "cache" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "20.231.196.38"
+  value   = "20.124.115.39"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
