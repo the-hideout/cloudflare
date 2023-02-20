@@ -18,6 +18,24 @@ resource "cloudflare_record" "www" {
 
 resource "cloudflare_record" "api" {
   name    = "api"
+  proxied = false
+  ttl     = 1
+  type    = "CNAME"
+  value   = "ecp.map.fastly.net"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "dev_api" {
+  name    = "dev-api"
+  proxied = false
+  ttl     = 1
+  type    = "CNAME"
+  value   = "ecp.map.fastly.net"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "streamer" {
+  name    = "streamer"
   proxied = true
   ttl     = 1
   type    = "CNAME"
@@ -25,8 +43,8 @@ resource "cloudflare_record" "api" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
-resource "cloudflare_record" "dev_api" {
-  name    = "dev-api"
+resource "cloudflare_record" "dev-streamer" {
+  name    = "dev-streamer"
   proxied = true
   ttl     = 1
   type    = "CNAME"
