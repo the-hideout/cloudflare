@@ -1,0 +1,16 @@
+name: tfsec
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  tfsec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3.3.0
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6 # pin@v1.0.3
