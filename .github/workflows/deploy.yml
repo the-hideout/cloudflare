@@ -1,0 +1,35 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  WORKING_DIR: "terraform/"
+
+jobs:
+  deploy:
+    if: github.event_name == 'push'
+    environment: production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3.3.0
+
+      - uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # pin@v2.0.3
+        with:
+          terraform_version: 1.1.7
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform apply
+        env:
+          TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+        run: terraform apply -auto-approve

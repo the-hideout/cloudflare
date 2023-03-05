@@ -1,5 +1,7 @@
 secrets/
 
+.vscode/
+
 # Terraform
 terraform.auto.tfvars.json
 .terraform/
