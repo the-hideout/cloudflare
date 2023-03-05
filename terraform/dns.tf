@@ -87,3 +87,21 @@ resource "cloudflare_record" "cache" {
   value   = "20.124.115.39"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
+
+resource "cloudflare_record" "dev_streamer" {
+  name    = "dev-streamer"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "api-development.hideout-api.workers.dev"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "streamer" {
+  name    = "streamer"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "api.hideout-api.workers.dev"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
