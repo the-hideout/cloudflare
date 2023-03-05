@@ -1,0 +1,23 @@
+name: new pull request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  WORKING_DIR: "terraform/"
+
+jobs:
+  new-pr:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+
+    steps:
+      # Comment on new PR requests with deployment instructions
+      - uses: actions/checkout@v3.3.0
+      - name: comment
+        uses: GrantBirki/comment@v2.0.3
+        continue-on-error: true
+        with:
+          file: .github/new-pr-comment.md
