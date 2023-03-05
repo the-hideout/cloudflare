@@ -15,8 +15,8 @@ permissions:
   checks: read
 
 jobs:
-  deploy:
-    name: deploy
+  branch-deploy:
+    name: branch-deploy
     runs-on: ubuntu-latest
     environment: secrets
     defaults:
