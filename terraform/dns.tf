@@ -18,10 +18,10 @@ resource "cloudflare_record" "www" {
 
 resource "cloudflare_record" "api" {
   name    = "api"
-  proxied = true
+  proxied = false
   ttl     = 1
   type    = "CNAME"
-  value   = "api.hideout-api.workers.dev"
+  value   = "ecp.map.fastly.net"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
