@@ -26,12 +26,13 @@ jobs:
     steps:
       - name: branch-deploy
         id: branch-deploy
-        uses: github/branch-deploy@v5.0.0
+        uses: github/branch-deploy@v5.1.0
         with:
           admins: the-hideout/core-contributors
           admins_pat: ${{ secrets.BRANCH_DEPLOY_ADMINS_PAT }}
+          environment_targets: production
 
-      - name: Checkout
+      - name: checkout
         if: steps.branch-deploy.outputs.continue == 'true'
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3.3.0
         with:
