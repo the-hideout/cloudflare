@@ -17,6 +17,14 @@ permissions:
 jobs:
   branch-deploy:
     name: branch-deploy
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, '.deploy') ||
+      startsWith(github.event.comment.body, '.noop') ||
+      startsWith(github.event.comment.body, '.lock') ||
+      startsWith(github.event.comment.body, '.help') ||
+      startsWith(github.event.comment.body, '.wcid') ||
+      startsWith(github.event.comment.body, '.unlock')) }}
     runs-on: ubuntu-latest
     environment: secrets
     defaults:
