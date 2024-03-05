@@ -6,6 +6,10 @@
 
 {% if status === "unknown" %} **{{ actor }}** your **{{ "noop" if noop else "branch" }}** deployment of `{{ ref }}` is in an unknown state when trying to deploy to the **{{ environment }}** environment.{% endif %}
 
+<details><summary>Show Results</summary>
+
 ```terraform
 <%= results %>
 ```
+
+</details>
