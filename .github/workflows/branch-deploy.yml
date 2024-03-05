@@ -17,6 +17,14 @@ permissions:
 jobs:
   branch-deploy:
     name: branch-deploy
+    if: # only run on pull request comments and very specific comment body string as defined in our branch-deploy settings
+      ${{ github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, '.deploy') ||
+      startsWith(github.event.comment.body, '.noop') ||
+      startsWith(github.event.comment.body, '.lock') ||
+      startsWith(github.event.comment.body, '.help') ||
+      startsWith(github.event.comment.body, '.wcid') ||
+      startsWith(github.event.comment.body, '.unlock')) }}
     runs-on: ubuntu-latest
     environment: secrets
     defaults:
@@ -54,36 +62,28 @@ jobs:
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         id: plan
-        run: terraform plan -no-color
         continue-on-error: true
+        run: |
+          set -o pipefail
+          terraform plan -no-color -compact-warnings | tee terraform-output.txt
 
       - name: Terraform apply
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
         env:
           TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         id: apply
-        run: terraform apply -no-color -auto-approve
         continue-on-error: true
-
-      - name: Terraform plan output
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' }}
-        env:
-          TF_STDOUT: ${{ steps.plan.outputs.stdout }}
         run: |
-          TF_OUTPUT="\`\`\`terraform\n${TF_STDOUT}\n\`\`\`"
-          echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
-          echo "$TF_OUTPUT" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          set -o pipefail
+          terraform apply -no-color -auto-approve -compact-warnings | tee terraform-output.txt
 
-      - name: Terraform apply output
-        if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
-        env:
-          TF_STDOUT: ${{ steps.apply.outputs.stdout }}
-        run: |
-          TF_OUTPUT="\`\`\`terraform\n${TF_STDOUT}\n\`\`\`"
-          echo 'DEPLOY_MESSAGE<<EOF' >> $GITHUB_ENV
-          echo "$TF_OUTPUT" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+      - name: terratrash
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
+        uses: GrantBirki/terratrash-action@v0.0.1
+        with:
+          input_file_path: terraform/terraform-output.txt
+          erb_render_template: ./github/deployment_message.md
+          erb_render_save_path: ./github/deployment_message.md
 
       - name: Check Terraform plan output
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
