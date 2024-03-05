@@ -80,6 +80,10 @@ jobs:
       - name: terratrash
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         uses: GrantBirki/terratrash-action@v0.0.1
+        with:
+          input_file_path: terraform/terraform-output.txt
+          erb_render_template: ./github/deployment_message.md
+          erb_render_save_path: ./github/deployment_message.md
 
       - name: Check Terraform plan output
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
