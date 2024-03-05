@@ -79,7 +79,7 @@ jobs:
 
       - name: terratrash
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        uses: GrantBirki/terratrash-action@v0.0.1
+        uses: GrantBirki/terratrash-action@v0.0.2
         with:
           input_file_path: terraform/terraform-output.txt
           erb_render_template: .github/deployment_message.md
