@@ -26,7 +26,7 @@ resource "cloudflare_ruleset" "security_response_headers" {
         operation = "set"
       }
     }
-    expression  = "(not http.host contains \"api\" and not http.host contains \"manager\" and not http.host contains \"status\")"
+    expression  = "(not http.host contains \"api\" and not http.host contains \"manager\" and not http.host contains \"status\" and not http.host contains \"dev-api\")"
     enabled     = true
     description = "Sets security response headers"
   }
