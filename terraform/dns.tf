@@ -83,8 +83,8 @@ resource "cloudflare_record" "cache" {
   name    = "cache"
   proxied = true
   ttl     = 1
-  type    = "A"
-  value   = "20.49.104.36"
+  type    = "CNAME"
+  value   = "tarkov-cache.azurewebsites.net"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
