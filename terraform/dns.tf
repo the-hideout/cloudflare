@@ -84,7 +84,15 @@ resource "cloudflare_record" "cache" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "20.124.115.39"
+  value   = "20.49.104.36"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "cache_azure_function_verification" {
+  name    = "asuid.cache"
+  ttl     = 1
+  type    = "TXT"
+  value   = "966A35FCB4A0FE1176E2320038F9EA960F6E2FE36A69ABDFC79A272FE4E2228F"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
