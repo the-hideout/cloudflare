@@ -262,4 +262,48 @@ resource "cloudflare_ruleset" "cache_rules" {
       }
     }
   }
+
+  rules {
+    action      = "set_cache_settings"
+    description = "players domain caching"
+    enabled     = true
+    expression  = "(http.host eq \"players.tarkov.dev\")"
+
+    action_parameters {
+      automatic_https_rewrites   = false
+      bic                        = false
+      cache                      = true
+      cookie_fields              = []
+      disable_apps               = false
+      disable_railgun            = false
+      disable_zaraz              = false
+      email_obfuscation          = false
+      hotlink_protection         = false
+      increment                  = 0
+      mirage                     = false
+      opportunistic_encryption   = false
+      origin_error_page_passthru = false
+      phases                     = []
+      products                   = []
+      request_fields             = []
+      respect_strong_etags       = false
+      response_fields            = []
+      rocket_loader              = false
+      rules                      = {}
+      rulesets                   = []
+      server_side_excludes       = false
+      status_code                = 0
+      sxg                        = false
+
+      browser_ttl {
+        default = 86400
+        mode    = "override_origin"
+      }
+
+      edge_ttl {
+        default = 86400
+        mode    = "override_origin"
+      }
+    }
+  }
 }
