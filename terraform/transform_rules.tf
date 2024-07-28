@@ -26,8 +26,23 @@ resource "cloudflare_ruleset" "security_response_headers" {
         operation = "set"
       }
     }
-    expression  = "(not http.host contains \"api\" and not http.host contains \"manager\" and not http.host contains \"status\")"
+    expression  = "(not http.host contains \"api\" and not http.host contains \"manager\" and not http.host contains \"status\" and not http.host contains \"player\")"
     enabled     = true
     description = "Sets security response headers"
+  }
+
+  rules {
+    action = "rewrite"
+    action_parameters {
+      # Note: headers must be in alphabetical order or you will have endless terraform plans changing state
+      headers {
+        name      = "Access-Control-Allow-Origin"
+        value     = "*"
+        operation = "set"
+      }
+    }
+    expression  = "(http.host eq \"player.tarkov.dev\")"
+    enabled     = true
+    description = "Add CORS header to player API"
   }
 }
