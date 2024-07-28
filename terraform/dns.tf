@@ -18,19 +18,19 @@ resource "cloudflare_record" "www" {
 
 resource "cloudflare_record" "api" {
   name    = "api"
-  proxied = false
+  proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "ecp.map.fastly.net"
+  value   = "api.hideout-api.workers.dev"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
 resource "cloudflare_record" "dev_api" {
   name    = "dev-api"
-  proxied = false
+  proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "ecp.map.fastly.net"
+  value   = "api-development.hideout-api.workers.dev"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -39,7 +39,7 @@ resource "cloudflare_record" "assets" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "assets.thehideout.io.s3-website-us-east-1.amazonaws.com"
+  value   = "assets.tarkov.dev.s3-website-us-east-1.amazonaws.com"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -57,7 +57,7 @@ resource "cloudflare_record" "status" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "20.228.137.173"
+  value   = "96.230.1.240"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -84,7 +84,7 @@ resource "cloudflare_record" "cache" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "20.124.115.39"
+  value   = "135.148.148.174"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -103,5 +103,14 @@ resource "cloudflare_record" "streamer" {
   ttl     = 1
   type    = "CNAME"
   value   = "api.hideout-api.workers.dev"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_record" "players" {
+  name    = "players"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  value   = "players.tarkov.dev.s3-website-us-east-1.amazonaws.com"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
