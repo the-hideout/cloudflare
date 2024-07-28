@@ -174,6 +174,22 @@ resource "cloudflare_ruleset" "cache_rules" {
         default = 604800
         mode    = "override_origin"
       }
+
+      cache_key {
+        cache_by_device_type       = false
+        cache_deception_armor      = false
+        ignore_query_strings_order = false
+
+        custom_key {
+
+          query_string {
+            exclude = [
+              "*",
+            ]
+            include = []
+          }
+        }
+      }
     }
   }
   rules {
@@ -216,6 +232,22 @@ resource "cloudflare_ruleset" "cache_rules" {
       edge_ttl {
         default = 16070400
         mode    = "override_origin"
+      }
+
+      cache_key {
+        cache_by_device_type       = false
+        cache_deception_armor      = false
+        ignore_query_strings_order = false
+
+        custom_key {
+
+          query_string {
+            exclude = [
+              "*",
+            ]
+            include = []
+          }
+        }
       }
     }
   }
@@ -260,6 +292,22 @@ resource "cloudflare_ruleset" "cache_rules" {
         default = 2678400
         mode    = "override_origin"
       }
+
+      cache_key {
+        cache_by_device_type       = false
+        cache_deception_armor      = false
+        ignore_query_strings_order = false
+
+        custom_key {
+
+          query_string {
+            exclude = [
+              "*",
+            ]
+            include = []
+          }
+        }
+      }
     }
   }
 
@@ -303,6 +351,22 @@ resource "cloudflare_ruleset" "cache_rules" {
       edge_ttl {
         default = 86400
         mode    = "override_origin"
+      }
+
+      cache_key {
+        cache_by_device_type       = false
+        cache_deception_armor      = false
+        ignore_query_strings_order = false
+
+        custom_key {
+
+          query_string {
+            exclude = [
+              "*",
+            ]
+            include = []
+          }
+        }
       }
     }
   }
