@@ -349,7 +349,7 @@ resource "cloudflare_ruleset" "cache_rules" {
       }
 
       edge_ttl {
-        default = 86400
+        default = 2678400
         mode    = "override_origin"
       }
 
