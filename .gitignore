@@ -5,3 +5,5 @@ secrets/
 # Terraform
 terraform.auto.tfvars.json
 .terraform/
+
+creds.env
