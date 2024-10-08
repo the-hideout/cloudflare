@@ -20,8 +20,8 @@ resource "cloudflare_record" "api" {
   name    = "api"
   proxied = true
   ttl     = 1
-  type    = "CNAME"
-  value   = "api.hideout-api.workers.dev"
+  type    = "A"
+  value   = "135.148.120.117"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -66,16 +66,7 @@ resource "cloudflare_record" "socket" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "tarkov-socket-server-production.up.railway.app"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_record" "market" {
-  name    = "market"
-  proxied = true
-  ttl     = 1
-  type    = "A"
-  value   = "209.151.146.50"
+  value   = "sxzwu785.up.railway.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
