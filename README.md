@@ -58,6 +58,7 @@ To develop with this repository locally, you will need to do the following:
 
 1. You should now be all setup and able to run a `terraform plan`!
 
+
 ### Reaching Out 💬
 
 Should you need assistance or have any questions using this repository, you can always join our [Discord](https://discord.gg/XPAsKGHSzH) for assistance.
