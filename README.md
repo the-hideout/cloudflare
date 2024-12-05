@@ -1,3 +1,5 @@
+noop test
+
 # cloudflare ☁️
 
 [![deploy](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml) [![tfsec](https://github.com/the-hideout/cloudflare/actions/workflows/tfsec.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/tfsec.yml) [![Discord](https://img.shields.io/discord/956236955815907388?color=7388DA&label=Discord)](https://discord.gg/XPAsKGHSzH)
