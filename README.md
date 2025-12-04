@@ -4,7 +4,7 @@
 
 Public Infrastructure as Code (IaC) for The-Hideout's Cloudflare (CF) configuration - managed by Terraform!
 
-## About 💡
+## About 💡 
 
 This repository uses Terraform to manage the configration and state for all supported pieces of our Cloudflare infrastruce:
 
