@@ -48,7 +48,7 @@ resource "cloudflare_record" "manager" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   = "20.115.107.210"
+  value   = "158.69.0.117"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
