@@ -66,7 +66,7 @@ resource "cloudflare_record" "socket" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
-  value   = "sxzwu785.up.railway.app"
+  value   = "tarkov-socket-server-production.up.railway.app"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
