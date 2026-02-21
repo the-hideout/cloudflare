@@ -56,7 +56,7 @@ resource "cloudflare_ruleset" "security_response_headers" {
         operation = "set"
       }
     }
-    expression  = "(starts_with(http.request.uri.path, "https://assets.tarkov.dev/maps/svg/"))"
+    expression  = "(starts_with(http.request.uri.path, \"https://assets.tarkov.dev/maps/svg/\"))"
     enabled     = true
     description = "Add CORS header to SVG maps"
   }
