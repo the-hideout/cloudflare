@@ -63,6 +63,7 @@ resource "cloudflare_record" "status" {
 
 resource "cloudflare_record" "socket" {
   name    = "socket"
+  allow_overwrite = true
   proxied = true
   ttl     = 1
   type    = "CNAME"
