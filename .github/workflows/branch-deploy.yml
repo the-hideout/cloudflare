@@ -27,7 +27,10 @@ jobs:
       startsWith(github.event.comment.body, '.wcid') ||
       startsWith(github.event.comment.body, '.unlock')) }}
     runs-on: ubuntu-latest
-    environment: secrets
+    environment:
+      name: production
+      deployment: false
+
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
@@ -35,7 +38,7 @@ jobs:
     steps:
       - name: branch-deploy
         id: branch-deploy
-        uses: github/branch-deploy@v10
+        uses: github/branch-deploy@fded0351b6b79f854b335c11b3d93063461dd288 # pin@v11.1.2
         with:
           admins: the-hideout/core-contributors
           admins_pat: ${{ secrets.BRANCH_DEPLOY_ADMINS_PAT }}
@@ -44,7 +47,7 @@ jobs:
 
       - name: checkout
         if: steps.branch-deploy.outputs.continue == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6
         with:
           ref: ${{ steps.branch-deploy.outputs.sha }}
 
@@ -80,7 +83,7 @@ jobs:
 
       - name: terratrash
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        uses: GrantBirki/terratrash-action@v1.0.0
+        uses: GrantBirki/terratrash-action@f4b67b8ee0925ff4ed28bd20c44bebbd16e8f892 # pin@v1.0.0
         with:
           input_file_path: terraform/terraform-output.txt
           erb_render_template: .github/deployment_message.md
