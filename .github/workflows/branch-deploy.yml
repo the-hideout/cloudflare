@@ -27,7 +27,10 @@ jobs:
       startsWith(github.event.comment.body, '.wcid') ||
       startsWith(github.event.comment.body, '.unlock')) }}
     runs-on: ubuntu-latest
-    environment: secrets
+    environment:
+      name: production
+      deployment: false
+
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIR }}
