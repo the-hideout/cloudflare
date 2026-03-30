@@ -98,6 +98,7 @@ resource "cloudflare_dns_record" "streamer" {
 }
 
 resource "cloudflare_dns_record" "players" {
+  comment = "players.tarkov.dev S3 bucket"
   content = "players.tarkov.dev.s3-website-us-east-1.amazonaws.com"
   name    = "players"
   proxied = true

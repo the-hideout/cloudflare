@@ -67,8 +67,9 @@ This repository now targets Terraform `1.14.7` and Cloudflare provider `5.17.0`.
 - The most important remote-state migrations are:
   - `cloudflare_zone_settings_override` -> `cloudflare_zone_setting`
   - `cloudflare_rate_limit` -> `cloudflare_ruleset` in `http_ratelimit`
-  - `cloudflare_argo` -> `cloudflare_argo_smart_routing` plus `cloudflare_argo_tiered_caching`
+  - `cloudflare_argo` -> `cloudflare_argo_tiered_caching`
   - existing `cloudflare_ruleset` resources should be re-imported when bridging through provider `4.52.5`
+- The current local Cloudflare token cannot read `argo/smart_routing`, so smart routing is intentionally left unmanaged until a token with that scope is available.
 
 ### Reaching Out 💬
 

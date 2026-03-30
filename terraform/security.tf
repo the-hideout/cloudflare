@@ -37,7 +37,7 @@ resource "cloudflare_ruleset" "api_rate_limit" {
     {
       action      = "block"
       description = "API"
-      enabled     = true
+      enabled     = false
       expression  = "concat(http.host, http.request.uri.path) wildcard r\"*api.tarkov.dev/*\""
       ref         = "fe2759fc96c544a2a6f7de5b92913bc1"
       ratelimit = {

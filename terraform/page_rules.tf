@@ -72,6 +72,9 @@ resource "cloudflare_page_rule" "fonts" {
     cache_level       = "cache_everything"
     edge_cache_ttl    = 2419200
   }
+  lifecycle {
+    ignore_changes = [actions["edge_cache_ttl"]]
+  }
   priority = 7
   status   = "active"
   target   = "tarkov.dev/fonts/*"
@@ -83,6 +86,9 @@ resource "cloudflare_page_rule" "images" {
     browser_cache_ttl = 31536000
     cache_level       = "cache_everything"
     edge_cache_ttl    = 2419200
+  }
+  lifecycle {
+    ignore_changes = [actions["edge_cache_ttl"]]
   }
   priority = 8
   status   = "active"

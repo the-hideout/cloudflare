@@ -27,9 +27,9 @@ locals {
     max_upload        = 100
 
     minify = {
-      css  = "on"
-      html = "on"
-      js   = "on"
+      css  = "off"
+      html = "off"
+      js   = "off"
     }
 
     security_header = {

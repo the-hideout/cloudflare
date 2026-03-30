@@ -57,8 +57,3 @@ moved {
   from = cloudflare_record.players
   to   = cloudflare_dns_record.players
 }
-
-moved {
-  from = cloudflare_argo.hideout_argo
-  to   = cloudflare_argo_smart_routing.hideout_argo
-}

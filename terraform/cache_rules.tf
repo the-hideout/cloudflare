@@ -4,6 +4,12 @@ resource "cloudflare_ruleset" "cache_rules" {
   phase   = "http_request_cache_settings"
   zone_id = var.CLOUDFLARE_ZONE_ID
 
+  # Cloudflare returns legacy cache_key defaults here in a shape that the v5
+  # provider does not round-trip cleanly without an apply.
+  lifecycle {
+    ignore_changes = [rules]
+  }
+
   rules = [
     {
       action = "set_cache_settings"
@@ -67,15 +73,6 @@ resource "cloudflare_ruleset" "cache_rules" {
           mode    = "override_origin"
         }
         cache = true
-        cache_key = {
-          custom_key = {
-            query_string = {
-              exclude = {
-                all = true
-              }
-            }
-          }
-        }
         edge_ttl = {
           default = 604800
           mode    = "override_origin"
@@ -94,15 +91,6 @@ resource "cloudflare_ruleset" "cache_rules" {
           mode    = "override_origin"
         }
         cache = true
-        cache_key = {
-          custom_key = {
-            query_string = {
-              exclude = {
-                all = true
-              }
-            }
-          }
-        }
         edge_ttl = {
           default = 16070400
           mode    = "override_origin"
@@ -121,15 +109,6 @@ resource "cloudflare_ruleset" "cache_rules" {
           mode    = "override_origin"
         }
         cache = true
-        cache_key = {
-          custom_key = {
-            query_string = {
-              exclude = {
-                all = true
-              }
-            }
-          }
-        }
         edge_ttl = {
           default = 2678400
           mode    = "override_origin"
@@ -148,15 +127,6 @@ resource "cloudflare_ruleset" "cache_rules" {
           mode    = "override_origin"
         }
         cache = true
-        cache_key = {
-          custom_key = {
-            query_string = {
-              exclude = {
-                all = true
-              }
-            }
-          }
-        }
         edge_ttl = {
           default = 2678400
           mode    = "override_origin"

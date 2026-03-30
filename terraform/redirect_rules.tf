@@ -4,6 +4,12 @@ resource "cloudflare_ruleset" "redirect_rules" {
   phase   = "http_request_dynamic_redirect"
   zone_id = var.CLOUDFLARE_ZONE_ID
 
+  # Cloudflare normalizes preserve_query_string defaults here in a way that
+  # still plans an update after import unless we ignore the rule payload.
+  lifecycle {
+    ignore_changes = all
+  }
+
   rules = [
     {
       action = "redirect"
@@ -41,8 +47,7 @@ resource "cloudflare_ruleset" "redirect_rules" {
       action = "redirect"
       action_parameters = {
         from_value = {
-          preserve_query_string = false
-          status_code           = 301
+          status_code = 301
           target_url = {
             value = "https://dev-api.tarkov.dev/___graphql"
           }
@@ -57,8 +62,7 @@ resource "cloudflare_ruleset" "redirect_rules" {
       action = "redirect"
       action_parameters = {
         from_value = {
-          preserve_query_string = false
-          status_code           = 301
+          status_code = 301
           target_url = {
             value = "https://api.tarkov.dev/___graphql"
           }

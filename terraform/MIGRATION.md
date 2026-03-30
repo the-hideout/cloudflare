@@ -25,16 +25,17 @@ expected to be a no-op.
 1. Import split zone settings.
    Remove `cloudflare_zone_settings_override.tarkov_dev` from state, then import
    the generated `cloudflare_zone_setting.settings[...]` instances.
+1. Replace the legacy Argo resource.
+   Remove `cloudflare_argo.hideout_argo` from state, then import
+   `cloudflare_argo_tiered_caching.hideout_argo`.
+   `cloudflare_argo_smart_routing.hideout_argo` still requires a token with
+   `smart_routing` access before it can be managed via provider v5.
 1. Import the live `http_ratelimit` ruleset.
    Replace the old `cloudflare_rate_limit` state with
    `cloudflare_ruleset.api_rate_limit`.
-1. Import `cloudflare_argo_tiered_caching.hideout_argo` if the provider accepts
-   the resource import; otherwise expect one additive create in plan output.
 
 ## Acceptance Bar
 
 - No planned destroys or replacements for the zone, DNS records, page rules, or
   existing rulesets.
 - A fully clean `.noop` plan if every split resource can be imported.
-- If `cloudflare_argo_tiered_caching` cannot be imported, the only acceptable
-  remaining diff is that additive create.
