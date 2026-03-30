@@ -1,6 +1,7 @@
 resource "cloudflare_zone" "tarkov_dev" {
-  plan = "pro"
+  account = {
+    id = var.CLOUDFLARE_ACCOUNT_ID
+  }
+  name = "tarkov.dev"
   type = "full"
-  zone = "tarkov.dev"
-  account_id = var.CLOUDFLARE_ACCOUNT_ID
 }
