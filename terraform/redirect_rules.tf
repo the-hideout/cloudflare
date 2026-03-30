@@ -4,214 +4,90 @@ resource "cloudflare_ruleset" "redirect_rules" {
   phase   = "http_request_dynamic_redirect"
   zone_id = var.CLOUDFLARE_ZONE_ID
 
-  rules {
-    action      = "redirect"
-    description = "Streamer domain graphql requests (dev)"
-    enabled     = true
-    expression  = "(starts_with(http.request.full_uri, \"https://dev-streamer.tarkov.dev/graphql\"))"
+  # Cloudflare normalizes preserve_query_string defaults here in a way that
+  # still plans an update after import unless we ignore the rule payload.
+  lifecycle {
+    ignore_changes = all
+  }
 
-    action_parameters {
-      automatic_https_rewrites   = false
-      bic                        = false
-      cache                      = false
-      cookie_fields              = []
-      disable_apps               = false
-      disable_railgun            = false
-      disable_zaraz              = false
-      email_obfuscation          = false
-      hotlink_protection         = false
-      increment                  = 0
-      mirage                     = false
-      opportunistic_encryption   = false
-      origin_error_page_passthru = false
-      phases                     = []
-      products                   = []
-      request_fields             = []
-      respect_strong_etags       = false
-      response_fields            = []
-      rocket_loader              = false
-      rules                      = {}
-      rulesets                   = []
-      server_side_excludes       = false
-      status_code                = 0
-      sxg                        = false
-
-      from_value {
-        preserve_query_string = true
-        status_code           = 308
-
-        target_url {
-          value = "https://dev-api.tarkov.dev/graphql"
+  rules = [
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          preserve_query_string = true
+          status_code           = 308
+          target_url = {
+            value = "https://dev-api.tarkov.dev/graphql"
+          }
         }
       }
-    }
-  }
-  rules {
-    action      = "redirect"
-    description = "Streamer domain graphql requests"
-    enabled     = true
-    expression  = "(starts_with(http.request.full_uri, \"https://streamer.tarkov.dev/graphql\"))"
-
-    action_parameters {
-      automatic_https_rewrites   = false
-      bic                        = false
-      cache                      = false
-      cookie_fields              = []
-      disable_apps               = false
-      disable_railgun            = false
-      disable_zaraz              = false
-      email_obfuscation          = false
-      hotlink_protection         = false
-      increment                  = 0
-      mirage                     = false
-      opportunistic_encryption   = false
-      origin_error_page_passthru = false
-      phases                     = []
-      products                   = []
-      request_fields             = []
-      respect_strong_etags       = false
-      response_fields            = []
-      rocket_loader              = false
-      rules                      = {}
-      rulesets                   = []
-      server_side_excludes       = false
-      status_code                = 0
-      sxg                        = false
-
-      from_value {
-        preserve_query_string = true
-        status_code           = 308
-
-        target_url {
-          value = "https://api.tarkov.dev/graphql"
+      description = "Streamer domain graphql requests (dev)"
+      enabled     = true
+      expression  = "(starts_with(http.request.full_uri, \"https://dev-streamer.tarkov.dev/graphql\"))"
+      ref         = "9525c3e2b4f1428592ba8070306cbce8"
+    },
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          preserve_query_string = true
+          status_code           = 308
+          target_url = {
+            value = "https://api.tarkov.dev/graphql"
+          }
         }
       }
-    }
-  }
-  rules {
-    action      = "redirect"
-    description = "Playground root to /___graphql (dev)"
-    enabled     = false
-    expression  = "(http.request.full_uri eq \"https://dev-api.tarkov.dev/\")"
-
-    action_parameters {
-      automatic_https_rewrites   = false
-      bic                        = false
-      cache                      = false
-      cookie_fields              = []
-      disable_apps               = false
-      disable_railgun            = false
-      disable_zaraz              = false
-      email_obfuscation          = false
-      hotlink_protection         = false
-      increment                  = 0
-      mirage                     = false
-      opportunistic_encryption   = false
-      origin_error_page_passthru = false
-      phases                     = []
-      products                   = []
-      request_fields             = []
-      respect_strong_etags       = false
-      response_fields            = []
-      rocket_loader              = false
-      rules                      = {}
-      rulesets                   = []
-      server_side_excludes       = false
-      status_code                = 0
-      sxg                        = false
-
-      from_value {
-        preserve_query_string = false
-        status_code           = 301
-
-        target_url {
-          value = "https://dev-api.tarkov.dev/___graphql"
+      description = "Streamer domain graphql requests"
+      enabled     = true
+      expression  = "(starts_with(http.request.full_uri, \"https://streamer.tarkov.dev/graphql\"))"
+      ref         = "e724c8da45da411aa54cf351b49bbbf2"
+    },
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          status_code = 301
+          target_url = {
+            value = "https://dev-api.tarkov.dev/___graphql"
+          }
         }
       }
-    }
-  }
-  rules {
-    action      = "redirect"
-    description = "Playground root to /___graphql"
-    enabled     = false
-    expression  = "(http.request.full_uri eq \"https://api.tarkov.dev/\")"
-
-    action_parameters {
-      automatic_https_rewrites   = false
-      bic                        = false
-      cache                      = false
-      cookie_fields              = []
-      disable_apps               = false
-      disable_railgun            = false
-      disable_zaraz              = false
-      email_obfuscation          = false
-      hotlink_protection         = false
-      increment                  = 0
-      mirage                     = false
-      opportunistic_encryption   = false
-      origin_error_page_passthru = false
-      phases                     = []
-      products                   = []
-      request_fields             = []
-      respect_strong_etags       = false
-      response_fields            = []
-      rocket_loader              = false
-      rules                      = {}
-      rulesets                   = []
-      server_side_excludes       = false
-      status_code                = 0
-      sxg                        = false
-
-      from_value {
-        preserve_query_string = false
-        status_code           = 301
-
-        target_url {
-          value = "https://api.tarkov.dev/___graphql"
+      description = "Playground root to /___graphql (dev)"
+      enabled     = false
+      expression  = "(http.request.full_uri eq \"https://dev-api.tarkov.dev/\")"
+      ref         = "582c2372ff22461d8a3e9e6cc8fe41a6"
+    },
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          status_code = 301
+          target_url = {
+            value = "https://api.tarkov.dev/___graphql"
+          }
         }
       }
-    }
-  }
-  rules {
-    action      = "redirect"
-    description = "Monitor API to Data Manager API"
-    enabled     = true
-    expression  = "(starts_with(http.request.full_uri, \"https://monitor.tarkov.dev/api\"))"
-
-    action_parameters {
-      automatic_https_rewrites   = false
-      bic                        = false
-      cache                      = false
-      cookie_fields              = []
-      disable_apps               = false
-      disable_railgun            = false
-      disable_zaraz              = false
-      email_obfuscation          = false
-      hotlink_protection         = false
-      increment                  = 0
-      mirage                     = false
-      opportunistic_encryption   = false
-      origin_error_page_passthru = false
-      phases                     = []
-      products                   = []
-      request_fields             = []
-      respect_strong_etags       = false
-      response_fields            = []
-      rocket_loader              = false
-      rules                      = {}
-      rulesets                   = []
-      server_side_excludes       = false
-      status_code                = 0
-      sxg                        = false
-
-      from_value {
-        preserve_query_string = true
-        status_code           = 308
-
-        target_url {
-          value = "https://manager.tarkov.dev/api/queue"
+      description = "Playground root to /___graphql"
+      enabled     = false
+      expression  = "(http.request.full_uri eq \"https://api.tarkov.dev/\")"
+      ref         = "4c99e6c4e1894cb6b003b47bab83b7e6"
+    },
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          preserve_query_string = true
+          status_code           = 308
+          target_url = {
+            value = "https://manager.tarkov.dev/api/queue"
+          }
         }
       }
-    }
-  }
+      description = "Monitor API to Data Manager API"
+      enabled     = true
+      expression  = "(starts_with(http.request.full_uri, \"https://monitor.tarkov.dev/api\"))"
+      ref         = "19a5d2d78bf54d0588ca127f290b3b06"
+    },
+  ]
 }

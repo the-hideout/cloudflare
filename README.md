@@ -1,6 +1,7 @@
 # cloudflare ☁️
 
-[![deploy](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml) [![tfsec](https://github.com/the-hideout/cloudflare/actions/workflows/tfsec.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/tfsec.yml) [![Discord](https://img.shields.io/discord/956236955815907388?color=7388DA&label=Discord)](https://discord.gg/XPAsKGHSzH)
+[![deploy](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml/badge.svg)](https://github.com/the-hideout/cloudflare/actions/workflows/deploy.yml)
+[![Discord](https://img.shields.io/discord/956236955815907388?color=7388DA&label=Discord)](https://discord.gg/XPAsKGHSzH)
 
 Public Infrastructure as Code (IaC) for The-Hideout's Cloudflare (CF) configuration - managed by Terraform!
 
@@ -35,28 +36,6 @@ To deploy a change to our CF infrastructure, simply do the following:
 1. Merge! Upon merging, your changes will be automatically deployed to production (again) ✨
 
 > Note: Since we are using branch deploys your merge will often show a "no changes" in the Terraform apply (in the GitHub Actions job). This is expected because if you branch deployed, your changes are already live so there is nothing Terraform needs to do. Hooray!
-
-### Local Development 🧱
-
-> Note: This section is entirely optional and really only used by core contributors. Opening a pull request with your changes will execute a Terraform Plan and suffice for 99% of use cases
-
-To develop with this repository locally, you will need to do the following:
-
-1. Install [tfenv](https://github.com/tfutils/tfenv)
-1. Install the proper version of Terraform as defined in the [`.terraform-version`](terraform/.terraform-version) file. Example:
-
-    ```bash
-    tfenv install x.x.x
-    ```
-
-1. Obtain a Terraform API token from a [Core Contributor](https://github.com/orgs/the-hideout/teams/core-contributors) - Note: Only trusted contributors will be given this level of access
-1. Run `terraform login` and paste the token when prompted
-1. Run `terraform init` to setup your workspace in the `terraform/` directory
-1. Edit the [`terraform.auto.tfvars.json.example`](terraform/terraform.auto.tfvars.json.example) file to contain your proper tokens and remove the `.example` from the file name - **Never** commit this file
-
-    > Note: This file will require you to fill in a `CLOUDFLARE_TOKEN` that can also be obtained from a [Core Contributor](https://github.com/orgs/the-hideout/teams/core-contributors)
-
-1. You should now be all setup and able to run a `terraform plan`!
 
 ### Reaching Out 💬
 
