@@ -7,14 +7,20 @@ Public Infrastructure as Code (IaC) for The-Hideout's Cloudflare (CF) configurat
 
 ## About 💡
 
-This repository uses Terraform to manage the configration and state for all supported pieces of our Cloudflare infrastruce:
+This repository uses Terraform to manage the configuration and state for supported pieces of our Cloudflare infrastructure:
 
 - [`Zones`](terraform/zones.tf)
 - [`DNS`](terraform/dns.tf)
+- [`DNS Features`](terraform/dns_features.tf)
 - [`Zone Settings`](terraform/zone_settings.tf)
-- [`Rate Limits + Some Security Settings`](terraform/security.tf)
+- [`Rate Limits`](terraform/security.tf)
+- [`Managed Firewall Rules`](terraform/firewall_managed.tf)
+- [`Managed Transforms`](terraform/managed_transforms.tf)
 - [`Page Rules`](terraform/page_rules.tf)
-- More to come!
+- [`Tiered Cache`](terraform/tiered_cache.tf)
+- [`URL Normalization`](terraform/url_normalization.tf)
+
+Because this repository is public, we intentionally keep sensitive records and security rules out of source control and only manage the safe subset here.
 
 ## Usage 🔨
 
