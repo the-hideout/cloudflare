@@ -157,7 +157,7 @@ resource "cloudflare_ruleset" "cache_rules" {
       }
       description = "JSON API"
       enabled     = true
-      expression  = "(http.host in {\"json.takrov.dev\" \"json-dev.tarkov.dev\"})"
+      expression  = "(http.host in {\"json.tarkov.dev\" \"json-dev.tarkov.dev\"})"
       ref         = "41bc28aa7bd14f0fae4ec79482aec843"
     },
   ]
