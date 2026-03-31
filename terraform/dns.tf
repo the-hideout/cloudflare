@@ -106,3 +106,57 @@ resource "cloudflare_dns_record" "players" {
   type    = "CNAME"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
+
+resource "cloudflare_dns_record" "dedapi" {
+  content = "135.148.120.117"
+  name    = "dedapi"
+  proxied = true
+  ttl     = 1
+  type    = "A"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "fence" {
+  content = "fence-worker.hideout-api.workers.dev"
+  name    = "fence"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "imagemagic" {
+  content = "image-generator-worker.hideout-api.workers.dev"
+  name    = "imagemagic"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "json_dev" {
+  content = "public.r2.dev"
+  name    = "json-dev"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "json" {
+  content = "public.r2.dev"
+  name    = "json"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "player" {
+  content = "player-stats-worker.hideout-api.workers.dev"
+  name    = "player"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}

@@ -1,0 +1,128 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  WORKING_DIR: terraform/
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      TF_VAR_CLOUDFLARE_TOKEN: test-token
+      TF_TOKEN_app_terraform_io: test-token
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # pin@v4.0.0
+        with:
+          terraform_version: 1.14.8
+
+      - name: prepare backendless copy
+        run: |
+          copy_dir="$(mktemp -d)"
+          ../script/ci/prepare-backendless-copy.sh "$PWD" "$copy_dir"
+          echo "BACKENDLESS_DIR=$copy_dir" >> "$GITHUB_ENV"
+
+      - name: terraform init
+        working-directory: ${{ env.BACKENDLESS_DIR }}
+        run: terraform init -backend=false -lockfile=readonly
+
+      - name: terraform validate
+        working-directory: ${{ env.BACKENDLESS_DIR }}
+        run: terraform validate -no-color
+
+  terraform-tests:
+    name: terraform-tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      TF_VAR_CLOUDFLARE_TOKEN: test-token
+      TF_TOKEN_app_terraform_io: test-token
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # pin@v4.0.0
+        with:
+          terraform_version: 1.14.8
+
+      - name: prepare backendless copy
+        run: |
+          copy_dir="$(mktemp -d)"
+          ../script/ci/prepare-backendless-copy.sh "$PWD" "$copy_dir"
+          echo "BACKENDLESS_DIR=$copy_dir" >> "$GITHUB_ENV"
+
+      - name: terraform init
+        working-directory: ${{ env.BACKENDLESS_DIR }}
+        run: terraform init -backend=false -lockfile=readonly
+
+      - name: terraform test
+        working-directory: ${{ env.BACKENDLESS_DIR }}
+        run: terraform test -no-color
+
+  backend-smoke:
+    name: backend-smoke
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    env:
+      TF_VAR_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6
+
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # pin@v4.0.0
+        with:
+          terraform_version: 1.14.8
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: terraform init
+        run: terraform init
+
+      - name: terraform state list
+        run: terraform state list > /dev/null
+
+      - name: refresh-only plan
+        run: |
+          set +e
+          output_file="$(mktemp)"
+          terraform plan -refresh-only -lock=false -input=false -detailed-exitcode -no-color | tee "$output_file"
+          status=$?
+          set -e
+
+          if grep -q '^No changes\.' "$output_file"; then
+            exit 0
+          fi
+
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if [ "$status" -eq 2 ]; then
+            echo "Refresh-only plan detected drift."
+          fi
+
+          exit "$status"
