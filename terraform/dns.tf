@@ -43,51 +43,6 @@ resource "cloudflare_dns_record" "assets" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
-resource "cloudflare_dns_record" "bot0" {
-  content = "9d9155e2-3ee5-4021-a097-3a78ac5a8409.cfargotunnel.com"
-  name    = "bot0"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "bot1" {
-  content = "6f3cafef-e8b3-418b-b9c5-7593919fb082.cfargotunnel.com"
-  name    = "bot1"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "bot2" {
-  content = "a1a1f356-20e1-4e25-ae65-1fd40375a4a0.cfargotunnel.com"
-  name    = "bot2"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "bot3" {
-  content = "80415cb0-98cc-49ac-a07a-78b71168579c.cfargotunnel.com"
-  name    = "bot3"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "bot4" {
-  content = "f9d2e31c-e2d0-4b45-bd5c-50423292d60a.cfargotunnel.com"
-  name    = "bot4"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
 resource "cloudflare_dns_record" "manager" {
   content = "158.69.0.117"
   name    = "manager"

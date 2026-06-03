@@ -5,26 +5,6 @@ variables {
 mock_provider "cloudflare" {}
 
 override_resource {
-  target = cloudflare_dns_record.bot0
-}
-
-override_resource {
-  target = cloudflare_dns_record.bot1
-}
-
-override_resource {
-  target = cloudflare_dns_record.bot2
-}
-
-override_resource {
-  target = cloudflare_dns_record.bot3
-}
-
-override_resource {
-  target = cloudflare_dns_record.bot4
-}
-
-override_resource {
   target = cloudflare_dns_record.mx_route1
 }
 
@@ -100,11 +80,6 @@ run "static_configuration" {
         cloudflare_dns_record.api,
         cloudflare_dns_record.dev_api,
         cloudflare_dns_record.assets,
-        cloudflare_dns_record.bot0,
-        cloudflare_dns_record.bot1,
-        cloudflare_dns_record.bot2,
-        cloudflare_dns_record.bot3,
-        cloudflare_dns_record.bot4,
         cloudflare_dns_record.manager,
         cloudflare_dns_record.status,
         cloudflare_dns_record.socket,
