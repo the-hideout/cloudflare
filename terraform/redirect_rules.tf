@@ -9,21 +9,6 @@ resource "cloudflare_ruleset" "redirect_rules" {
       action = "redirect"
       action_parameters = {
         from_value = {
-          status_code = 301
-          target_url = {
-            value = "https://tarkov.dev"
-          }
-        }
-      }
-      description = "Redirect www to apex"
-      enabled     = true
-      expression  = "(http.host eq \"www.tarkov.dev\")"
-      ref         = "www_redirect"
-    },
-    {
-      action = "redirect"
-      action_parameters = {
-        from_value = {
           preserve_query_string = true
           status_code           = 308
           target_url = {
@@ -97,6 +82,21 @@ resource "cloudflare_ruleset" "redirect_rules" {
       enabled     = true
       expression  = "(starts_with(http.request.full_uri, \"https://monitor.tarkov.dev/api\"))"
       ref         = "19a5d2d78bf54d0588ca127f290b3b06"
+    },
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          status_code = 301
+          target_url = {
+            value = "https://tarkov.dev"
+          }
+        }
+      }
+      description = "Redirect www to apex"
+      enabled     = true
+      expression  = "(http.host eq \"www.tarkov.dev\")"
+      ref         = "www_redirect"
     },
   ]
 }
