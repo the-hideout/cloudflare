@@ -26,7 +26,7 @@ Because this repository is public, we intentionally keep sensitive records, Work
 
 ## Usage 🔨
 
-The best and suggested way to make changes to our Cloudflare configurations is through pull requests. You *can* make changes by running Terraform locally but this requires the proper setup, and credentials. These steps will be noted below but are generally reserved for core contributors to the project
+The best and suggested way to make changes to our Cloudflare configurations is through pull requests. You *can* make changes by running Terraform locally but this requires the proper setup, and credentials. These steps will be noted below but are generally reserved for core contributors to the project.
 
 ### Deployment 🚀
 
