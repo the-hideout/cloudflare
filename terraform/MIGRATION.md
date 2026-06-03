@@ -1,41 +1,37 @@
-# Cloudflare Provider v5 State Migration
+# Cloudflare Terraform State Migration
 
-This repo now contains the Terraform v5-compatible HCL, but the remote backend
-state still needs authenticated migration work before the final plan can be
-expected to be a no-op.
+This repo uses Cloudflare Terraform provider v5-compatible HCL. State migration
+work must be authenticated against Terraform Cloud and Cloudflare before the
+final plan can be expected to be a no-op.
 
 ## Prerequisites
 
-1. Install Terraform `1.14.7` via `tfenv`.
-1. Run `terraform login` for `app.terraform.io`.
-1. Make sure `terraform/terraform.auto.tfvars.json` exists locally with
-   `CLOUDFLARE_TOKEN`.
+1. Install the Terraform version in `../.terraform-version`.
+1. Authenticate Terraform Cloud for `app.terraform.io`.
+1. Export `TF_VAR_CLOUDFLARE_TOKEN` from a token file or local secret manager.
+   Do not print token values into terminal logs.
 
 ## Remote State Safety
 
-1. Run `terraform state pull > backup-$(date +%Y%m%d-%H%M%S).tfstate`.
+1. Run `terraform state pull > ../.terraform-state-backups/backup-$(date +%Y%m%d-%H%M%S).tfstate`.
 1. Do not run `terraform apply` as part of the migration.
 1. Use `terraform plan` after each migration chunk.
 
-## Required Migration Chunks
+## Current Migration Chunks
 
-1. Bridge rulesets through provider `4.52.5`.
-   Update the provider to `4.52.5`, re-import the existing rulesets, and confirm
-   the remote plan does not contain destructive drift before moving to v5.
-1. Import split zone settings.
-   Remove `cloudflare_zone_settings_override.tarkov_dev` from state, then import
-   the generated `cloudflare_zone_setting.settings[...]` instances.
-1. Replace the legacy Argo resource.
-   Remove `cloudflare_argo.hideout_argo` from state, then import
-   `cloudflare_argo_tiered_caching.hideout_argo`.
-   `cloudflare_argo_smart_routing.hideout_argo` still requires a token with
-   `smart_routing` access before it can be managed via provider v5.
-1. Import the live `http_ratelimit` ruleset.
-   Replace the old `cloudflare_rate_limit` state with
-   `cloudflare_ruleset.api_rate_limit`.
+1. Import public DNS records and safe zone ruleset entrypoints into Terraform
+   state.
+1. Replace legacy Page Rules with native Redirect, Cache, and Configuration
+   Rules. Once the native rules are live, the old Page Rules can be deleted by
+   Terraform.
+1. Keep Pages projects, Worker scripts/bindings, KV contents, and sensitive
+   security policy outside this public repository unless a future review marks a
+   specific resource safe to publish.
 
 ## Acceptance Bar
 
-- No planned destroys or replacements for the zone, DNS records, page rules, or
-  existing rulesets.
-- A fully clean `.noop` plan if every split resource can be imported.
+- No planned destroys or replacements for the zone, DNS records, or existing
+  rulesets other than the intentional deletion of legacy Page Rules after their
+  native equivalents are in place.
+- A fully clean `.noop` plan after imports and Page Rule replacement have been
+  applied.

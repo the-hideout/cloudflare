@@ -16,11 +16,13 @@ This repository uses Terraform to manage the configuration and state for support
 - [`Rate Limits`](terraform/security.tf)
 - [`Managed Firewall Rules`](terraform/firewall_managed.tf)
 - [`Managed Transforms`](terraform/managed_transforms.tf)
-- [`Page Rules`](terraform/page_rules.tf)
+- [`Redirect Rules`](terraform/redirect_rules.tf)
+- [`Cache Rules`](terraform/cache_rules.tf)
+- [`Configuration Rules`](terraform/config_rules.tf)
 - [`Tiered Cache`](terraform/tiered_cache.tf)
 - [`URL Normalization`](terraform/url_normalization.tf)
 
-Because this repository is public, we intentionally keep sensitive records and security rules out of source control and only manage the safe subset here.
+Because this repository is public, we intentionally keep sensitive records, Worker code, Worker bindings, Pages secrets, KV contents, and private security posture out of source control and only manage the safe subset here.
 
 ## Usage 🔨
 

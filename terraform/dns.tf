@@ -160,3 +160,90 @@ resource "cloudflare_dns_record" "player" {
   type    = "CNAME"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
+
+resource "cloudflare_dns_record" "mx_route1" {
+  content  = "route1.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 98
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "mx_route2" {
+  content  = "route2.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 34
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "mx_route3" {
+  content  = "route3.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 29
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "dkim_cf2024_1" {
+  content = join(" ", [
+    "\"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78k\"",
+    "\"m4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB\"",
+  ])
+  name    = "cf2024-1._domainkey"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "railway_verify_socket" {
+  content = "\"railway-verify=2134678b9d3fde0c6a1b7f03560597e57d1b94d3980501f7edcb6a4b76b1db03\""
+  name    = "_railway-verify.socket"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_primary" {
+  content = "google-site-verification=ynS4YwsVQK-m34NgKErmdJKL0rIykucxyFJjM-In6RI"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_secondary" {
+  content = "google-site-verification=ociH_8-A27BdUGbgdFW3bFeSUKkYM-1WIzpc3Yrouj8"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "spf" {
+  content = "v=spf1 include:_spf.mx.cloudflare.net ~all"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_tertiary" {
+  content = "google-site-verification=lWaLn42vZ_DRR_kVCouHYJeurjfCVa6cyJuSPuX0_yc"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}

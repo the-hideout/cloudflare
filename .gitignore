@@ -5,5 +5,6 @@ secrets/
 # Terraform
 terraform.auto.tfvars.json
 .terraform/
+.terraform-state-backups/
 
 creds.env
