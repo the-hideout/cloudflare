@@ -68,6 +68,18 @@ override_resource {
   target = cloudflare_ruleset.custom_errors
 }
 
+override_resource {
+  target = cloudflare_workers_kv_namespace.data_cache_dev
+}
+
+override_resource {
+  target = cloudflare_workers_kv_namespace.data_cache
+}
+
+override_resource {
+  target = cloudflare_workers_kv_namespace.stash_data
+}
+
 run "static_configuration" {
   command = plan
 
@@ -168,6 +180,15 @@ run "static_configuration" {
       cloudflare_zone_setting.settings["security_level"].value == "medium"
     )
     error_message = "Key zone, cache, and security settings must remain explicitly configured."
+  }
+
+  assert {
+    condition = (
+      cloudflare_workers_kv_namespace.data_cache_dev.title == "DATA_CACHE_DEV" &&
+      cloudflare_workers_kv_namespace.data_cache.title == "DATA_CACHE" &&
+      cloudflare_workers_kv_namespace.stash_data.title == "STASH_DATA"
+    )
+    error_message = "Public-safe account resource imports must stay limited to KV namespace shells."
   }
 
   assert {
