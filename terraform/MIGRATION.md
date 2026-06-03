@@ -11,18 +11,6 @@ final plan can be expected to be a no-op.
 1. Export `TF_VAR_CLOUDFLARE_TOKEN` from a token file or local secret manager.
    Do not print token values into terminal logs.
 
-## Cloudflare Token Scope
-
-After the Page Rule resources are gone, the GitHub `CLOUDFLARE_TOKEN` secret can
-use an account-owned token with no Page Rules permission. The token still needs
-zone read/edit access for the resources in this repo:
-
-- Zone, DNS, DNS Settings, Zone Settings, SSL and Certificates.
-- Cache Rules, Cache Settings, Single Redirects, Config Settings, Custom Errors.
-- Transform Rules, Managed Headers, Firewall Services or Zone WAF.
-- Workers KV Storage at account scope if the KV namespace shells in this repo
-  are imported and managed.
-
 ## Remote State Safety
 
 1. Run `terraform state pull > ../.terraform-state-backups/backup-$(date +%Y%m%d-%H%M%S).tfstate`.
