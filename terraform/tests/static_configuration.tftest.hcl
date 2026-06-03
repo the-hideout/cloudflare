@@ -68,18 +68,6 @@ override_resource {
   target = cloudflare_ruleset.custom_errors
 }
 
-override_resource {
-  target = cloudflare_workers_kv_namespace.data_cache_dev
-}
-
-override_resource {
-  target = cloudflare_workers_kv_namespace.data_cache
-}
-
-override_resource {
-  target = cloudflare_workers_kv_namespace.stash_data
-}
-
 run "static_configuration" {
   command = plan
 
@@ -141,17 +129,6 @@ run "static_configuration" {
       ] : !record.proxied && record.zone_id == var.CLOUDFLARE_ZONE_ID
     ])
     error_message = "Managed mail and verification records must remain DNS-only records in the target zone."
-  }
-
-  assert {
-    condition = alltrue([
-      for namespace in [
-        cloudflare_workers_kv_namespace.data_cache_dev,
-        cloudflare_workers_kv_namespace.data_cache,
-        cloudflare_workers_kv_namespace.stash_data,
-      ] : namespace.account_id == var.CLOUDFLARE_ACCOUNT_ID
-    ])
-    error_message = "Managed KV namespace shells must stay pinned to The Hideout account."
   }
 
   assert {

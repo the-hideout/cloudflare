@@ -19,7 +19,6 @@ This repository uses Terraform to manage the configuration and state for support
 - [`Redirect Rules`](terraform/redirect_rules.tf)
 - [`Cache Rules`](terraform/cache_rules.tf)
 - [`Configuration Rules`](terraform/config_rules.tf)
-- [`KV Namespaces`](terraform/kv_namespaces.tf)
 - [`Tiered Cache`](terraform/tiered_cache.tf)
 - [`URL Normalization`](terraform/url_normalization.tf)
 

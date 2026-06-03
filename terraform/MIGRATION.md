@@ -19,8 +19,8 @@ final plan can be expected to be a no-op.
 
 ## Current Migration Chunks
 
-1. Apply the config-driven imports in `imports.tf` for public DNS records, safe
-   zone ruleset entrypoints, and KV namespace shells.
+1. Import public DNS records and safe zone ruleset entrypoints into Terraform
+   state.
 1. Replace legacy Page Rules with native Redirect, Cache, and Configuration
    Rules. Once the native rules are live, the old Page Rules can be deleted by
    Terraform.
