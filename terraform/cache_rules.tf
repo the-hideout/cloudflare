@@ -214,7 +214,7 @@ resource "cloudflare_ruleset" "cache_rules" {
         }
         cache = true
         edge_ttl = {
-          default = 2419200
+          default = 16070400
           mode    = "override_origin"
         }
       }
@@ -232,7 +232,7 @@ resource "cloudflare_ruleset" "cache_rules" {
         }
         cache = true
         edge_ttl = {
-          default = 2419200
+          default = 16070400
           mode    = "override_origin"
         }
       }
