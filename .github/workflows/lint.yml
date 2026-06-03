@@ -24,10 +24,15 @@ jobs:
       - name: checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # pin@v6
 
+      - name: read terraform version
+        id: terraform-version
+        working-directory: .
+        run: echo "version=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
+
       - name: setup terraform
         uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # pin@v4.0.0
         with:
-          terraform_version: 1.14.8
+          terraform_version: ${{ steps.terraform-version.outputs.version }}
 
       - name: setup tflint
         uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93 # pin@v6.2.2

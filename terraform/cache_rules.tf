@@ -4,13 +4,94 @@ resource "cloudflare_ruleset" "cache_rules" {
   phase   = "http_request_cache_settings"
   zone_id = var.CLOUDFLARE_ZONE_ID
 
-  # Cloudflare returns legacy cache_key defaults here in a shape that the v5
-  # provider does not round-trip cleanly without an apply.
-  lifecycle {
-    ignore_changes = [rules]
-  }
-
   rules = [
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        cache = true
+      }
+      description = "cache service"
+      enabled     = true
+      expression  = "(http.host eq \"cache.tarkov.dev\")"
+      ref         = "cache_service"
+    },
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        browser_ttl = {
+          default = 120
+          mode    = "override_origin"
+        }
+      }
+      description = "status service browser cache"
+      enabled     = true
+      expression  = "(http.host eq \"status.tarkov.dev\")"
+      ref         = "status_services"
+    },
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        cache = true
+      }
+      description = "status custom cache"
+      enabled     = true
+      expression  = "(http.host eq \"status.tarkov.dev\" and http.request.uri.path eq \"/api/status-page/heartbeat/api\")"
+      ref         = "status_custom_cache"
+    },
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        browser_ttl = {
+          default = 86400
+          mode    = "override_origin"
+        }
+        cache = true
+        edge_ttl = {
+          default = 86400
+          mode    = "override_origin"
+        }
+      }
+      description = "tarkov.dev data json"
+      enabled     = true
+      expression  = "(http.host eq \"tarkov.dev\" and starts_with(http.request.uri.path, \"/data/\") and ends_with(http.request.uri.path, \".json\"))"
+      ref         = "data_json"
+    },
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        browser_ttl = {
+          default = 31536000
+          mode    = "override_origin"
+        }
+        cache = true
+        edge_ttl = {
+          default = 2419200
+          mode    = "override_origin"
+        }
+      }
+      description = "tarkov.dev fonts"
+      enabled     = true
+      expression  = "(http.host eq \"tarkov.dev\" and http.request.uri.path contains \"/fonts/\")"
+      ref         = "fonts_page_rule"
+    },
+    {
+      action = "set_cache_settings"
+      action_parameters = {
+        browser_ttl = {
+          default = 31536000
+          mode    = "override_origin"
+        }
+        cache = true
+        edge_ttl = {
+          default = 2419200
+          mode    = "override_origin"
+        }
+      }
+      description = "tarkov.dev images"
+      enabled     = true
+      expression  = "(http.host eq \"tarkov.dev\" and http.request.uri.path contains \"/images/\")"
+      ref         = "images_page_rule"
+    },
     {
       action = "set_cache_settings"
       action_parameters = {

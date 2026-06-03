@@ -43,6 +43,51 @@ resource "cloudflare_dns_record" "assets" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
+resource "cloudflare_dns_record" "bot0" {
+  content = "9d9155e2-3ee5-4021-a097-3a78ac5a8409.cfargotunnel.com"
+  name    = "bot0"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "bot1" {
+  content = "6f3cafef-e8b3-418b-b9c5-7593919fb082.cfargotunnel.com"
+  name    = "bot1"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "bot2" {
+  content = "a1a1f356-20e1-4e25-ae65-1fd40375a4a0.cfargotunnel.com"
+  name    = "bot2"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "bot3" {
+  content = "80415cb0-98cc-49ac-a07a-78b71168579c.cfargotunnel.com"
+  name    = "bot3"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "bot4" {
+  content = "f9d2e31c-e2d0-4b45-bd5c-50423292d60a.cfargotunnel.com"
+  name    = "bot4"
+  proxied = true
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
 resource "cloudflare_dns_record" "manager" {
   content = "158.69.0.117"
   name    = "manager"
@@ -158,5 +203,92 @@ resource "cloudflare_dns_record" "player" {
   proxied = true
   ttl     = 1
   type    = "CNAME"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "mx_route1" {
+  content  = "route1.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 98
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "mx_route2" {
+  content  = "route2.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 34
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "mx_route3" {
+  content  = "route3.mx.cloudflare.net"
+  name     = "tarkov.dev"
+  priority = 29
+  proxied  = false
+  ttl      = 1
+  type     = "MX"
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "dkim_cf2024_1" {
+  content = join(" ", [
+    "\"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiweykoi+o48IOGuP7GR3X0MOExCUDY/BCRHoWBnh3rChl7WhdyCxW3jgq1daEjPPqoi7sJvdg5hEQVsgVRQP4DcnQDVjGMbASQtrY4WmB1VebF+RPJB2ECPsEDTpeiI5ZyUAwJaVX7r6bznU67g7LvFq35yIo4sdlmtZGV+i0H4cpYH9+3JJ78k\"",
+    "\"m4KXwaf9xUJCWF6nxeD+qG6Fyruw1Qlbds2r85U9dkNDVAS3gioCvELryh1TxKGiVTkg4wqHTyHfWsp7KD3WQHYJn0RyfJJu6YEmL77zonn7p2SRMvTMP3ZEXibnC9gz3nnhR6wcYL8Q7zXypKTMD58bTixDSJwIDAQAB\"",
+  ])
+  name    = "cf2024-1._domainkey"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "railway_verify_socket" {
+  content = "\"railway-verify=2134678b9d3fde0c6a1b7f03560597e57d1b94d3980501f7edcb6a4b76b1db03\""
+  name    = "_railway-verify.socket"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_primary" {
+  content = "google-site-verification=ynS4YwsVQK-m34NgKErmdJKL0rIykucxyFJjM-In6RI"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_secondary" {
+  content = "google-site-verification=ociH_8-A27BdUGbgdFW3bFeSUKkYM-1WIzpc3Yrouj8"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 3600
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "spf" {
+  content = "v=spf1 include:_spf.mx.cloudflare.net ~all"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
+resource "cloudflare_dns_record" "google_site_verification_tertiary" {
+  content = "google-site-verification=lWaLn42vZ_DRR_kVCouHYJeurjfCVa6cyJuSPuX0_yc"
+  name    = "tarkov.dev"
+  proxied = false
+  ttl     = 1
+  type    = "TXT"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }

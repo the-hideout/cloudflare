@@ -4,13 +4,22 @@ resource "cloudflare_ruleset" "redirect_rules" {
   phase   = "http_request_dynamic_redirect"
   zone_id = var.CLOUDFLARE_ZONE_ID
 
-  # Cloudflare normalizes preserve_query_string defaults here in a way that
-  # still plans an update after import unless we ignore the rule payload.
-  lifecycle {
-    ignore_changes = all
-  }
-
   rules = [
+    {
+      action = "redirect"
+      action_parameters = {
+        from_value = {
+          status_code = 301
+          target_url = {
+            value = "https://tarkov.dev"
+          }
+        }
+      }
+      description = "Redirect www to apex"
+      enabled     = true
+      expression  = "(http.host eq \"www.tarkov.dev\")"
+      ref         = "www_redirect"
+    },
     {
       action = "redirect"
       action_parameters = {
