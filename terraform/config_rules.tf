@@ -8,16 +8,6 @@ resource "cloudflare_ruleset" "config_settings" {
     {
       action = "set_config"
       action_parameters = {
-        sxg = true
-      }
-      description = "tarkov.dev - configuration"
-      enabled     = false
-      expression  = "(http.host eq \"tarkov.dev\")"
-      ref         = "cac9df6c991d49d693cc4d2519f8f3ee"
-    },
-    {
-      action = "set_config"
-      action_parameters = {
         ssl = "full"
       }
       description = "socket.tarkov.dev SSL/TLS set to Full"
