@@ -116,24 +116,6 @@ resource "cloudflare_dns_record" "dedapi" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
-resource "cloudflare_dns_record" "fence" {
-  content = "fence-worker.hideout-api.workers.dev"
-  name    = "fence"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "imagemagic" {
-  content = "image-generator-worker.hideout-api.workers.dev"
-  name    = "imagemagic"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
 resource "cloudflare_dns_record" "json_dev" {
   content = "public.r2.dev"
   name    = "json-dev"
@@ -146,15 +128,6 @@ resource "cloudflare_dns_record" "json_dev" {
 resource "cloudflare_dns_record" "json" {
   content = "public.r2.dev"
   name    = "json"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "player" {
-  content = "player-stats-worker.hideout-api.workers.dev"
-  name    = "player"
   proxied = true
   ttl     = 1
   type    = "CNAME"
