@@ -78,6 +78,7 @@ run "static_configuration" {
         cloudflare_dns_record.root,
         cloudflare_dns_record.www,
         cloudflare_dns_record.api,
+        cloudflare_dns_record.streamer,
         cloudflare_dns_record.assets,
         cloudflare_dns_record.manager,
         cloudflare_dns_record.status,

@@ -25,6 +25,15 @@ resource "cloudflare_dns_record" "api" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
+resource "cloudflare_dns_record" "streamer" {
+  content = "135.148.120.117"
+  name    = "streamer"
+  proxied = true
+  ttl     = 1
+  type    = "A"
+  zone_id = var.CLOUDFLARE_ZONE_ID
+}
+
 resource "cloudflare_dns_record" "assets" {
   content = "assets.tarkov.dev.s3-website-us-east-1.amazonaws.com"
   name    = "assets"
