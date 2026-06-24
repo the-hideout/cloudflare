@@ -79,24 +79,6 @@ resource "cloudflare_dns_record" "cache" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
-resource "cloudflare_dns_record" "dev_streamer" {
-  content = "api-development.hideout-api.workers.dev"
-  name    = "dev-streamer"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "streamer" {
-  content = "api.hideout-api.workers.dev"
-  name    = "streamer"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
 resource "cloudflare_dns_record" "players" {
   comment = "players.tarkov.dev S3 bucket"
   content = "players.tarkov.dev.s3-website-us-east-1.amazonaws.com"
