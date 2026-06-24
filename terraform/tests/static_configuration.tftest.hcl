@@ -88,11 +88,8 @@ run "static_configuration" {
         cloudflare_dns_record.streamer,
         cloudflare_dns_record.players,
         cloudflare_dns_record.dedapi,
-        cloudflare_dns_record.fence,
-        cloudflare_dns_record.imagemagic,
         cloudflare_dns_record.json_dev,
         cloudflare_dns_record.json,
-        cloudflare_dns_record.player,
       ] : contains(["A", "CNAME"], record.type) &&
       record.proxied &&
       record.ttl == 1 &&
