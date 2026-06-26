@@ -25,12 +25,12 @@ resource "cloudflare_dns_record" "api" {
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
-resource "cloudflare_dns_record" "dev_api" {
-  content = "api-development.hideout-api.workers.dev"
-  name    = "dev-api"
+resource "cloudflare_dns_record" "streamer" {
+  content = "135.148.120.117"
+  name    = "streamer"
   proxied = true
   ttl     = 1
-  type    = "CNAME"
+  type    = "A"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
@@ -76,24 +76,6 @@ resource "cloudflare_dns_record" "cache" {
   proxied = true
   ttl     = 1
   type    = "A"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "dev_streamer" {
-  content = "api-development.hideout-api.workers.dev"
-  name    = "dev-streamer"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = var.CLOUDFLARE_ZONE_ID
-}
-
-resource "cloudflare_dns_record" "streamer" {
-  content = "api.hideout-api.workers.dev"
-  name    = "streamer"
-  proxied = true
-  ttl     = 1
-  type    = "CNAME"
   zone_id = var.CLOUDFLARE_ZONE_ID
 }
 
