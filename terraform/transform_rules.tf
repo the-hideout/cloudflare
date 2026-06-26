@@ -41,7 +41,7 @@ resource "cloudflare_ruleset" "security_response_headers" {
       }
       description = "Add CORS header to player API"
       enabled     = true
-      expression  = "(http.host eq \"player.tarkov.dev\")"
+      expression  = "(http.host in {\"player.tarkov.dev\" \"players.tarkov.dev\"})"
       ref         = "495c1bf608f740c18639ecdfdea7eb13"
     },
     {
