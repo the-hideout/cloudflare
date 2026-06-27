@@ -20,7 +20,6 @@ This repository uses Terraform to manage the configuration and state for support
 - [`Cache Rules`](terraform/cache_rules.tf)
 - [`Configuration Rules`](terraform/config_rules.tf)
 - [`Tiered Cache`](terraform/tiered_cache.tf)
-- [`URL Normalization`](terraform/url_normalization.tf)
 
 Because this repository is public, we intentionally keep sensitive records, Worker code, Worker bindings, Pages secrets, KV contents, and private security posture out of source control and only manage the safe subset here.
 
