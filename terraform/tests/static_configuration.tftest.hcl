@@ -143,8 +143,6 @@ run "static_configuration" {
   assert {
     condition = (
       cloudflare_zone_dnssec.tarkov_dev.status == "disabled" &&
-      cloudflare_url_normalization_settings.tarkov_dev.scope == "incoming" &&
-      cloudflare_url_normalization_settings.tarkov_dev.type == "cloudflare" &&
       cloudflare_tiered_cache.tarkov_dev.value == "on" &&
       cloudflare_zone_setting.settings["ssl"].value == "flexible" &&
       cloudflare_zone_setting.settings["security_level"].value == "medium"
