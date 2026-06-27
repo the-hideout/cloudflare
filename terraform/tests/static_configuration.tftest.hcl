@@ -37,6 +37,10 @@ override_resource {
 }
 
 override_resource {
+  target = cloudflare_dns_record.streamer
+}
+
+override_resource {
   target = cloudflare_dns_record.google_site_verification_tertiary
 }
 
