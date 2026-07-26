@@ -9,7 +9,7 @@
 <details><summary>Show Results</summary>
 
 ```terraform
-<%= results %>
+{{ results }}
 ```
 
 </details>
