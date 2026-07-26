@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: branch-deploy
         id: branch-deploy
-        uses: github/branch-deploy@ddf8ca48e9cdb2d2c7c71dee428308b19af9313f # pin@v11.1.4
+        uses: github/branch-deploy@f0984057ffe1aa340aa017b6eafb894310aed88e # pin@v12.0.0
         with:
           admins: GrantBirki,Razzmatazzz
           environment_targets: production
@@ -91,8 +91,18 @@ jobs:
         uses: GrantBirki/terratrash-action@f4b67b8ee0925ff4ed28bd20c44bebbd16e8f892 # pin@v1.0.0
         with:
           input_file_path: terraform/terraform-output.txt
-          erb_render_template: .github/deployment_message.md
-          erb_render_save_path: .github/deployment_message.md
+          output_file_path: terraform/terraform-output-fmt.txt
+
+      - name: Set deployment message
+        if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
+        working-directory: .
+        run: |
+          delimiter="branch-deploy-$(openssl rand -hex 16)"
+          {
+            echo "DEPLOY_MESSAGE<<${delimiter}"
+            cat terraform/terraform-output-fmt.txt
+            echo "${delimiter}"
+          } >> "$GITHUB_ENV"
 
       - name: Check Terraform plan output
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop == 'true' && steps.plan.outcome == 'failure' }}
