@@ -74,7 +74,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          terraform plan -no-color -compact-warnings | tee terraform-output.txt
+          terraform plan -no-color -compact-warnings | tee "${RUNNER_TEMP}/terraform-output.txt"
 
       - name: Terraform apply
         if: ${{ steps.branch-deploy.outputs.continue == 'true' && steps.branch-deploy.outputs.noop != 'true' }}
@@ -84,24 +84,71 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          terraform apply -no-color -auto-approve -compact-warnings | tee terraform-output.txt
+          terraform apply -no-color -auto-approve -compact-warnings | tee "${RUNNER_TEMP}/terraform-output.txt"
 
       - name: terratrash
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
         uses: GrantBirki/terratrash-action@f4b67b8ee0925ff4ed28bd20c44bebbd16e8f892 # pin@v1.0.0
         with:
-          input_file_path: terraform/terraform-output.txt
-          output_file_path: terraform/terraform-output-fmt.txt
+          input_file_path: ${{ runner.temp }}/terraform-output.txt
+          output_file_path: ${{ runner.temp }}/terraform-output-fmt.txt
 
       - name: Set deployment message
         if: ${{ steps.branch-deploy.outputs.continue == 'true' }}
-        working-directory: .
+        shell: bash
+        env:
+          DEPLOYMENT_RESULTS_PATH: ${{ runner.temp }}/terraform-output-fmt.txt
         run: |
-          delimiter="branch-deploy-$(openssl rand -hex 16)"
+          set -euo pipefail
+
+          if [[ -L "$DEPLOYMENT_RESULTS_PATH" || ! -f "$DEPLOYMENT_RESULTS_PATH" || ! -r "$DEPLOYMENT_RESULTS_PATH" ]]; then
+            printf '%s\n' 'The deployment message is not a readable regular file.' >&2
+            exit 1
+          fi
+
+          new_delimiter() {
+            printf 'branch_deploy_%s' "$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          }
+
+          while :; do
+            delimiter="$(new_delimiter)"
+
+            if [[ ! "$delimiter" =~ ^branch_deploy_[0-9a-f]{32}$ ]]; then
+              printf '%s\n' 'Failed to create a safe deployment-message delimiter.' >&2
+              exit 1
+            fi
+
+            if LC_ALL=C grep -Fxq -- "$delimiter" "$DEPLOYMENT_RESULTS_PATH"; then
+              continue
+            else
+              scan_status=$?
+              if [[ "$scan_status" -ne 1 ]]; then
+                printf '%s\n' 'Failed to verify the deployment-message delimiter.' >&2
+                exit 1
+              fi
+            fi
+            break
+          done
+
+          needs_separator=false
+          if [[ -s "$DEPLOYMENT_RESULTS_PATH" ]]; then
+            final_byte="$(tail -c 1 "$DEPLOYMENT_RESULTS_PATH" | od -An -tx1 | tr -d '[:space:]')"
+            if [[ ! "$final_byte" =~ ^[0-9a-f]{2}$ ]]; then
+              printf '%s\n' 'Failed to inspect the final deployment-message byte.' >&2
+              exit 1
+            fi
+            if [[ "$final_byte" != 0a ]]; then
+              needs_separator=true
+            fi
+          fi
+
           {
-            echo "DEPLOY_MESSAGE<<${delimiter}"
-            cat terraform/terraform-output-fmt.txt
-            echo "${delimiter}"
+            printf 'DEPLOY_MESSAGE<<%s\n' "$delimiter"
+            cat "$DEPLOYMENT_RESULTS_PATH"
+            if [[ "$needs_separator" == true ]]; then
+              printf '\n'
+            fi
+            printf '%s\n' "$delimiter"
           } >> "$GITHUB_ENV"
 
       - name: Check Terraform plan output
